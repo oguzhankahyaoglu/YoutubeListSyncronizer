@@ -100,9 +100,11 @@ namespace YoutubeListSyncronizer
 
         private void btnDownload_Click(object sender, EventArgs e)
         {
-            btnDownload.Enabled = btnFetchPlaylist.Enabled = false;
             folderBrowser.ShowDialog();
             var videoFolder = folderBrowser.SelectedPath;
+            if (videoFolder.IsNullOrEmptyString())
+                return;
+            btnDownload.Enabled = btnFetchPlaylist.Enabled = false;
             StartDownloading(videoFolder);
         }
 
@@ -117,6 +119,7 @@ namespace YoutubeListSyncronizer
             var videoIDsDictionary = listWorker.VideoIDsDictionary.Reverse();
             CountOfVideos = videoIDsDictionary.Count();
             progressBar.Value = 0;
+            progressBar.Show();
             ProgressArr = new int[CountOfVideos];
             foreach (var kvp in videoIDsDictionary)
             {
@@ -131,7 +134,7 @@ namespace YoutubeListSyncronizer
                                                        if (args.ProgressPercentage == 100)
                                                        {
                                                            if (innerWorker.IsSuccessful)
-                                                               text = "Completed!";
+                                                               text = innerWorker.IsAlreadyExists ? "Already exists." : "Completed!";
                                                            else
                                                                text = "Failed to find resolution: " + (innerWorker.Exception != null ? innerWorker.Exception.Message : "");
                                                        }
@@ -148,6 +151,27 @@ namespace YoutubeListSyncronizer
                 innerWorker.RunWorkerAsync();
                 index++;
             }
+        }
+
+
+        ToolTip mTooltip = new ToolTip();
+        Point mLastPos = new Point(-1, -1);
+        private void listView_MouseMove(object sender, MouseEventArgs e)
+        {
+            ListViewHitTestInfo info = listView.HitTest(e.X, e.Y);
+            if (mLastPos != e.Location)
+            {
+                if (info.Item != null && info.SubItem != null)
+                {
+                    mTooltip.ToolTipTitle = info.Item.Text;
+                    mTooltip.Show(info.SubItem.Text, info.Item.ListView, e.X, e.Y, 20000);
+                }
+                else
+                {
+                    mTooltip.SetToolTip(listView, string.Empty);
+                }
+            }
+            mLastPos = e.Location;
         }
     }
 }

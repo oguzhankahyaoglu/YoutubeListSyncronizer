@@ -35,7 +35,7 @@ namespace YoutubeListSyncronizer.Library
             this.OnDownloadStarted(EventArgs.Empty);
 
             var request = (HttpWebRequest)WebRequest.Create(this.Video.DownloadUrl);
-            request.Timeout = 1000*60*2;
+            request.Timeout = 1000*60*15;
             if (this.BytesToDownload.HasValue)
             {
                 request.AddRange(0, this.BytesToDownload.Value - 1);

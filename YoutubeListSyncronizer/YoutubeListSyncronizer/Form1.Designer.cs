@@ -56,7 +56,7 @@
             // 
             this.btnFetchPlaylist.Location = new System.Drawing.Point(620, 10);
             this.btnFetchPlaylist.Name = "btnFetchPlaylist";
-            this.btnFetchPlaylist.Size = new System.Drawing.Size(96, 23);
+            this.btnFetchPlaylist.Size = new System.Drawing.Size(152, 23);
             this.btnFetchPlaylist.TabIndex = 1;
             this.btnFetchPlaylist.Text = "Fetch Videos";
             this.btnFetchPlaylist.UseVisualStyleBackColor = true;
@@ -72,7 +72,7 @@
             // 
             // folderBrowser
             // 
-            this.folderBrowser.RootFolder = System.Environment.SpecialFolder.MyVideos;
+            this.folderBrowser.RootFolder = System.Environment.SpecialFolder.MyComputer;
             // 
             // label1
             // 
@@ -88,7 +88,7 @@
             this.btnDownload.Enabled = false;
             this.btnDownload.Location = new System.Drawing.Point(560, 537);
             this.btnDownload.Name = "btnDownload";
-            this.btnDownload.Size = new System.Drawing.Size(156, 23);
+            this.btnDownload.Size = new System.Drawing.Size(212, 23);
             this.btnDownload.TabIndex = 4;
             this.btnDownload.Text = "Start Downloading";
             this.btnDownload.UseVisualStyleBackColor = true;
@@ -106,10 +106,11 @@
             this.listView.Location = new System.Drawing.Point(13, 39);
             this.listView.MultiSelect = false;
             this.listView.Name = "listView";
-            this.listView.Size = new System.Drawing.Size(703, 494);
+            this.listView.Size = new System.Drawing.Size(759, 494);
             this.listView.TabIndex = 5;
             this.listView.UseCompatibleStateImageBehavior = false;
             this.listView.View = System.Windows.Forms.View.Details;
+            this.listView.MouseMove += new System.Windows.Forms.MouseEventHandler(this.listView_MouseMove);
             // 
             // columnHeader1
             // 
@@ -135,7 +136,7 @@
             // 
             this.progressBar.Location = new System.Drawing.Point(13, 569);
             this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(703, 22);
+            this.progressBar.Size = new System.Drawing.Size(759, 22);
             this.progressBar.Step = 1;
             this.progressBar.TabIndex = 6;
             this.progressBar.Visible = false;
@@ -162,7 +163,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(728, 603);
+            this.ClientSize = new System.Drawing.Size(784, 603);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.cbmMaxRes);
             this.Controls.Add(this.progressBar);
@@ -172,8 +173,8 @@
             this.Controls.Add(this.lblPercent);
             this.Controls.Add(this.btnFetchPlaylist);
             this.Controls.Add(this.txtPlaylist);
-            this.MaximumSize = new System.Drawing.Size(744, 641);
-            this.MinimumSize = new System.Drawing.Size(744, 641);
+            this.MaximumSize = new System.Drawing.Size(800, 641);
+            this.MinimumSize = new System.Drawing.Size(800, 641);
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Youtube List Syncronizer";
