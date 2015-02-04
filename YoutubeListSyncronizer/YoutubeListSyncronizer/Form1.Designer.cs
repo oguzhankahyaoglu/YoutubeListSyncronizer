@@ -39,18 +39,18 @@
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.progressBar = new System.Windows.Forms.ProgressBar();
+            this.cbmMaxRes = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.txtPageStart = new System.Windows.Forms.NumericUpDown();
-            ((System.ComponentModel.ISupportInitialize)(this.txtPageStart)).BeginInit();
             this.SuspendLayout();
             // 
             // txtPlaylist
             // 
-            this.txtPlaylist.Location = new System.Drawing.Point(117, 12);
+            this.txtPlaylist.Location = new System.Drawing.Point(126, 12);
             this.txtPlaylist.Name = "txtPlaylist";
-            this.txtPlaylist.Size = new System.Drawing.Size(272, 20);
+            this.txtPlaylist.Size = new System.Drawing.Size(488, 20);
             this.txtPlaylist.TabIndex = 0;
-            this.txtPlaylist.Text = "FL0O6m-jrVllHCo94bJ-a9bA";
+            this.txtPlaylist.Text = "https://www.youtube.com/playlist?list=FL0O6m-jrVllHCo94bJ-a9bA";
             // 
             // btnFetchPlaylist
             // 
@@ -79,14 +79,14 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(12, 15);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(99, 13);
+            this.label1.Size = new System.Drawing.Size(108, 13);
             this.label1.TabIndex = 3;
-            this.label1.Text = "Youtube Playlist ID:";
+            this.label1.Text = "Youtube Playlist Link:";
             // 
             // btnDownload
             // 
             this.btnDownload.Enabled = false;
-            this.btnDownload.Location = new System.Drawing.Point(560, 568);
+            this.btnDownload.Location = new System.Drawing.Point(560, 537);
             this.btnDownload.Name = "btnDownload";
             this.btnDownload.Size = new System.Drawing.Size(156, 23);
             this.btnDownload.TabIndex = 4;
@@ -106,7 +106,7 @@
             this.listView.Location = new System.Drawing.Point(13, 39);
             this.listView.MultiSelect = false;
             this.listView.Name = "listView";
-            this.listView.Size = new System.Drawing.Size(703, 523);
+            this.listView.Size = new System.Drawing.Size(703, 494);
             this.listView.TabIndex = 5;
             this.listView.UseCompatibleStateImageBehavior = false;
             this.listView.View = System.Windows.Forms.View.Details;
@@ -131,53 +131,52 @@
             this.columnHeader4.Text = "Status";
             this.columnHeader4.Width = 101;
             // 
+            // progressBar
+            // 
+            this.progressBar.Location = new System.Drawing.Point(13, 569);
+            this.progressBar.Name = "progressBar";
+            this.progressBar.Size = new System.Drawing.Size(703, 22);
+            this.progressBar.Step = 1;
+            this.progressBar.TabIndex = 6;
+            this.progressBar.Visible = false;
+            // 
+            // cbmMaxRes
+            // 
+            this.cbmMaxRes.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbmMaxRes.FormattingEnabled = true;
+            this.cbmMaxRes.Location = new System.Drawing.Point(454, 539);
+            this.cbmMaxRes.Name = "cbmMaxRes";
+            this.cbmMaxRes.Size = new System.Drawing.Size(100, 21);
+            this.cbmMaxRes.TabIndex = 7;
+            // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(395, 15);
+            this.label2.Location = new System.Drawing.Point(335, 544);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(100, 13);
-            this.label2.TabIndex = 6;
-            this.label2.Text = "Paging Start Index: ";
-            // 
-            // txtPageStart
-            // 
-            this.txtPageStart.Increment = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-            this.txtPageStart.Location = new System.Drawing.Point(501, 13);
-            this.txtPageStart.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.txtPageStart.Name = "txtPageStart";
-            this.txtPageStart.Size = new System.Drawing.Size(113, 20);
-            this.txtPageStart.TabIndex = 7;
-            this.txtPageStart.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
+            this.label2.Size = new System.Drawing.Size(113, 13);
+            this.label2.TabIndex = 8;
+            this.label2.Text = "Max Video Resolution:";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(728, 603);
-            this.Controls.Add(this.txtPageStart);
             this.Controls.Add(this.label2);
+            this.Controls.Add(this.cbmMaxRes);
+            this.Controls.Add(this.progressBar);
             this.Controls.Add(this.listView);
             this.Controls.Add(this.btnDownload);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.lblPercent);
             this.Controls.Add(this.btnFetchPlaylist);
             this.Controls.Add(this.txtPlaylist);
+            this.MaximumSize = new System.Drawing.Size(744, 641);
+            this.MinimumSize = new System.Drawing.Size(744, 641);
             this.Name = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Youtube List Syncronizer";
-            ((System.ComponentModel.ISupportInitialize)(this.txtPageStart)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -196,8 +195,9 @@
         private System.Windows.Forms.ColumnHeader columnHeader2;
         private System.Windows.Forms.ColumnHeader columnHeader3;
         private System.Windows.Forms.ColumnHeader columnHeader4;
+        private System.Windows.Forms.ProgressBar progressBar;
+        private System.Windows.Forms.ComboBox cbmMaxRes;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.NumericUpDown txtPageStart;
     }
 }
 

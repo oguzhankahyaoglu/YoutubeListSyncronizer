@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -26,59 +27,76 @@ namespace YoutubeListSyncronizer
         public Form1()
         {
             InitializeComponent();
+            cbmMaxRes.Items.AddRange(MaxResolutions.Cast<object>().ToArray());
+            cbmMaxRes.SelectedIndex = 2;
         }
 
-        private Dictionary<string, string> VideoIDsDictionary;
+        private YoutubeListDownloadWorker listWorker;
         private void btnFetchPlaylist_Click(object sender, EventArgs e)
         {
-            String xmlStr = DownloadPlaylistXml();
-            VideoIDsDictionary = new Dictionary<string, string>();
-            var videoCount = PrepareVideoIDs(xmlStr, VideoIDsDictionary);
-            MessageBox.Show("Total videos in this list:" + videoCount);
-            btnDownload.Enabled = true;
-            listView.Items.Clear();
-            var index = 1;
-            foreach (var kvp in VideoIDsDictionary)
-            {
-                var item = new ListViewItem(new[] { index.ToString(), kvp.Key, kvp.Value, "" });
-                listView.Items.Add(item);
-                index++;
-            }
+            btnFetchPlaylist.Enabled = false;
+            var playlistId = ParsePlaylistId(txtPlaylist.Text);
+            listWorker = new YoutubeListDownloadWorker(playlistId);
+            progressBar.Show();
+            listWorker.ProgressChanged += (o, args) =>
+                                              {
+                                                  progressBar.Value = Math.Min(100, args.ProgressPercentage);
+                                              };
+            listWorker.RunWorkerCompleted += (o, args) =>
+                                             {
+                                                 MessageBox.Show("Total videos in this list:" + listWorker.TotalVideoCount);
+                                                 btnDownload.Enabled = true;
+                                                 listView.Items.Clear();
+                                                 var index = 1;
+
+                                                 var orderedDic = listWorker.VideoIDsDictionary.Reverse();
+                                                 foreach (var kvp in orderedDic)
+                                                 {
+                                                     var item = new ListViewItem(new[] { index.ToString("D4"), kvp.Key, kvp.Value, "" });
+                                                     listView.Items.Add(item);
+                                                     index++;
+                                                 }
+                                                 progressBar.Hide();
+                                             };
+            listWorker.RunWorkerAsync();
         }
 
         #region Helpers
 
-        private int PrepareVideoIDs(string xmlStr, Dictionary<string, string> videoIDs)
+        public static NameValueCollection ParseQueryString(string s)
         {
-            var xDoc = XDocument.Parse(xmlStr);
-            var rootElem = xDoc.Elements().First();
-            var entries = rootElem.Elements(XName.Get("entry", "http://www.w3.org/2005/Atom"));
-            foreach (var entry in entries)
-            {
-                var mediaGroupElem = entry.Element(XName.Get("group", "http://search.yahoo.com/mrss/"));
-                var videoIdElem = mediaGroupElem.Element(XName.Get("videoid", "http://gdata.youtube.com/schemas/2007"));
-                var videoId = videoIdElem.Value;
+            var nvc = new NameValueCollection();
 
-                var mediaTitleElem = mediaGroupElem.Element(XName.Get("title", "http://search.yahoo.com/mrss/"));
-                var title = mediaTitleElem.Value;
-                videoIDs.Add(videoId, title);
-            }
-            var totalVideoCount = rootElem.Element(XName.Get("totalResults", "http://a9.com/-/spec/opensearch/1.1/")).Value.ToNullableInt(0);
-            return totalVideoCount;
-        }
-
-        private string DownloadPlaylistXml()
-        {
-            const string urlFormat = @"https://gdata.youtube.com/feeds/api/playlists/{0}?v=2&max-results=50&start-index={1}";
-            string xmlStr;
-            using (var client = new WebClient())
+            // remove anything other than query string from url
+            if (s.Contains("?"))
             {
-                xmlStr = client.DownloadString(urlFormat.FormatString(txtPlaylist.Text, txtPageStart.Value));
+                s = s.Substring(s.IndexOf('?') + 1);
             }
-            return xmlStr;
+
+            foreach (string vp in Regex.Split(s, "&"))
+            {
+                string[] singlePair = Regex.Split(vp, "=");
+                if (singlePair.Length == 2)
+                {
+                    nvc.Add(singlePair[0], singlePair[1]);
+                }
+                else
+                {
+                    // only one key with no value specified in query string
+                    nvc.Add(singlePair[0], string.Empty);
+                }
+            }
+
+            return nvc;
         }
 
         #endregion
+
+        private string ParsePlaylistId(string link)
+        {
+            var qscoll = ParseQueryString(link);
+            return qscoll["list"];
+        }
 
         private void btnDownload_Click(object sender, EventArgs e)
         {
@@ -88,32 +106,47 @@ namespace YoutubeListSyncronizer
             StartDownloading(videoFolder);
         }
 
+        private static readonly int[] MaxResolutions = new[] { 1080, 720, 480, 360 };
+
+        private int[] ProgressArr;
+        private int CountOfVideos;
         private void StartDownloading(string videoFolder)
         {
             var index = 0;
             var completed = 0;
-            foreach (var kvp in VideoIDsDictionary)
+            var videoIDsDictionary = listWorker.VideoIDsDictionary.Reverse();
+            CountOfVideos = videoIDsDictionary.Count();
+            progressBar.Value = 0;
+            ProgressArr = new int[CountOfVideos];
+            foreach (var kvp in videoIDsDictionary)
             {
                 var videoID = kvp.Key;
                 var url = "http://www.youtube.com/watch?v=" + videoID;
-                var innerWorker = new YoutubeDownloadBackgroundWorker(videoFolder, url, index);
+                var innerWorker = new YoutubeDownloadBackgroundWorker(videoFolder, url, index, MaxResolutions[cbmMaxRes.SelectedIndex]);
                 innerWorker.ProgressChanged += (o, args) =>
                                                    {
-                                                       listView.Items[args.UserState.ToInt()].SubItems[3].Text = "%" + args.ProgressPercentage;
+                                                       var itemIndex = args.UserState.ToInt();
+                                                       var text = "%" + args.ProgressPercentage;
+                                                       ProgressArr[itemIndex] = args.ProgressPercentage;
+                                                       if (args.ProgressPercentage == 100)
+                                                       {
+                                                           if (innerWorker.IsSuccessful)
+                                                               text = "Completed!";
+                                                           else
+                                                               text = "Failed to find resolution: " + (innerWorker.Exception != null ? innerWorker.Exception.Message : "");
+                                                       }
+                                                       listView.Items[itemIndex].SubItems[3].Text = text;
+                                                       progressBar.Value = Math.Min(100, Convert.ToInt32(ProgressArr.Sum() / (CountOfVideos * 1.0)));
                                                    };
                 innerWorker.RunWorkerCompleted += (o, args) =>
                                                       {
                                                           completed++;
                                                           var _index = args.UserState.ToNullableInt();
-                                                          if(_index!=null)
-                                                            listView.Items[_index.Value].SubItems[3].Text = "Complete!";
+                                                          if (_index != null)
+                                                              listView.Items[_index.Value].SubItems[3].Text = "Complete!";
                                                       };
                 innerWorker.RunWorkerAsync();
                 index++;
-                listView.Invalidate();
-                listView.Update();
-                listView.Refresh();
-                Application.DoEvents();
             }
         }
     }
