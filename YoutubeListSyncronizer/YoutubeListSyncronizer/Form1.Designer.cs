@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.txtPlaylist = new System.Windows.Forms.TextBox();
             this.btnFetchPlaylist = new System.Windows.Forms.Button();
             this.lblPercent = new System.Windows.Forms.Label();
@@ -42,23 +43,26 @@
             this.progressBar = new System.Windows.Forms.ProgressBar();
             this.cbmMaxRes = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.numericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.label3 = new System.Windows.Forms.Label();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown)).BeginInit();
             this.SuspendLayout();
             // 
             // txtPlaylist
             // 
             this.txtPlaylist.Location = new System.Drawing.Point(126, 12);
             this.txtPlaylist.Name = "txtPlaylist";
-            this.txtPlaylist.Size = new System.Drawing.Size(488, 20);
+            this.txtPlaylist.Size = new System.Drawing.Size(459, 20);
             this.txtPlaylist.TabIndex = 0;
             this.txtPlaylist.Text = "https://www.youtube.com/playlist?list=FL0O6m-jrVllHCo94bJ-a9bA";
             // 
             // btnFetchPlaylist
             // 
-            this.btnFetchPlaylist.Location = new System.Drawing.Point(620, 10);
+            this.btnFetchPlaylist.Location = new System.Drawing.Point(591, 10);
             this.btnFetchPlaylist.Name = "btnFetchPlaylist";
-            this.btnFetchPlaylist.Size = new System.Drawing.Size(152, 23);
+            this.btnFetchPlaylist.Size = new System.Drawing.Size(181, 23);
             this.btnFetchPlaylist.TabIndex = 1;
-            this.btnFetchPlaylist.Text = "Fetch Videos";
+            this.btnFetchPlaylist.Text = "Fetch Videos From Playlist";
             this.btnFetchPlaylist.UseVisualStyleBackColor = true;
             this.btnFetchPlaylist.Click += new System.EventHandler(this.btnFetchPlaylist_Click);
             // 
@@ -130,7 +134,7 @@
             // columnHeader4
             // 
             this.columnHeader4.Text = "Status";
-            this.columnHeader4.Width = 101;
+            this.columnHeader4.Width = 163;
             // 
             // progressBar
             // 
@@ -159,11 +163,34 @@
             this.label2.TabIndex = 8;
             this.label2.Text = "Max Video Resolution:";
             // 
+            // numericUpDown
+            // 
+            this.numericUpDown.Location = new System.Drawing.Point(141, 540);
+            this.numericUpDown.Name = "numericUpDown";
+            this.numericUpDown.Size = new System.Drawing.Size(59, 20);
+            this.numericUpDown.TabIndex = 9;
+            this.numericUpDown.Value = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(12, 542);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(123, 13);
+            this.label3.TabIndex = 10;
+            this.label3.Text = "Max Parallel Downloads:";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 603);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.numericUpDown);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.cbmMaxRes);
             this.Controls.Add(this.progressBar);
@@ -173,11 +200,13 @@
             this.Controls.Add(this.lblPercent);
             this.Controls.Add(this.btnFetchPlaylist);
             this.Controls.Add(this.txtPlaylist);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximumSize = new System.Drawing.Size(800, 641);
             this.MinimumSize = new System.Drawing.Size(800, 641);
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Youtube List Syncronizer";
+            this.Text = "Youtube Playlist Sycronizer";
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -199,6 +228,8 @@
         private System.Windows.Forms.ProgressBar progressBar;
         private System.Windows.Forms.ComboBox cbmMaxRes;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.NumericUpDown numericUpDown;
+        private System.Windows.Forms.Label label3;
     }
 }
 

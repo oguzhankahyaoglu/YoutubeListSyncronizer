@@ -31,6 +31,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>favicon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Kahia.Common.Extensions">
       <HintPath>..\..\..\Kahia.Bin\v1.0\Kahia.Common.Extensions\Kahia.Common.Extensions.dll</HintPath>
@@ -98,6 +101,9 @@
       <Project>{c3f9793f-68be-466d-8aa9-702a204eb024}</Project>
       <Name>YoutubeListSyncronizer.Library</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="favicon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Threading;
 
 namespace YoutubeListSyncronizer.Library
 {
@@ -25,6 +26,9 @@ namespace YoutubeListSyncronizer.Library
         /// </summary>
         public event EventHandler<ProgressEventArgs> DownloadProgressChanged;
 
+        private static int ActiveRequestCount = 0;
+        public static int MaxActiveRequestCount = 3;
+
         /// <summary>
         /// Starts the video download.
         /// </summary>
@@ -32,50 +36,61 @@ namespace YoutubeListSyncronizer.Library
         /// <exception cref="WebException">An error occured while downloading the video.</exception>
         public override void Execute()
         {
-            this.OnDownloadStarted(EventArgs.Empty);
-
-            var request = (HttpWebRequest)WebRequest.Create(this.Video.DownloadUrl);
-            request.Timeout = 1000*60*15;
-            if (this.BytesToDownload.HasValue)
+            try
             {
-                request.AddRange(0, this.BytesToDownload.Value - 1);
-            }
-
-            // the following code is alternative, you may implement the function after your needs
-            using (WebResponse response = request.GetResponse())
-            {
-                using (Stream source = response.GetResponseStream())
+                lock (this)
                 {
-                    using (FileStream target = File.Open(this.SavePath, FileMode.Create, FileAccess.Write))
+                    this.OnDownloadStarted(EventArgs.Empty);
+                    while (ActiveRequestCount >= MaxActiveRequestCount)
                     {
-                        var buffer = new byte[1024];
-                        bool cancel = false;
-                        int bytes;
-                        int copiedBytes = 0;
+                        //Do nothing until another request ends.
+                        Thread.Sleep(5000);
+                    }
+                    ActiveRequestCount++;
+                    var request = (HttpWebRequest)WebRequest.Create(this.Video.DownloadUrl);
+                    request.Timeout = 1000 * 60 * 15;
+                    if (this.BytesToDownload.HasValue)
+                    {
+                        request.AddRange(0, this.BytesToDownload.Value - 1);
+                    }
 
-                        while (!cancel && (bytes = source.Read(buffer, 0, buffer.Length)) > 0)
+                    // the following code is alternative, you may implement the function after your needs
+                    using (WebResponse response = request.GetResponse())
+                    {
+                        using (Stream source = response.GetResponseStream())
                         {
-                            target.Write(buffer, 0, bytes);
-
-                            copiedBytes += bytes;
-
-                            var eventArgs = new ProgressEventArgs((copiedBytes * 1.0 / response.ContentLength) * 100);
-
-                            if (this.DownloadProgressChanged != null)
+                            using (FileStream target = File.Open(this.SavePath, FileMode.Create, FileAccess.Write))
                             {
-                                this.DownloadProgressChanged(this, eventArgs);
-
-                                if (eventArgs.Cancel)
+                                var buffer = new byte[1024];
+                                bool cancel = false;
+                                int bytes;
+                                int copiedBytes = 0;
+                                while (!cancel && (bytes = source.Read(buffer, 0, buffer.Length)) > 0)
                                 {
-                                    cancel = true;
+                                    target.Write(buffer, 0, bytes);
+                                    copiedBytes += bytes;
+                                    var eventArgs = new ProgressEventArgs((copiedBytes * 1.0 / response.ContentLength) * 100);
+                                    if (this.DownloadProgressChanged != null)
+                                    {
+                                        this.DownloadProgressChanged(this, eventArgs);
+                                        if (eventArgs.Cancel)
+                                        {
+                                            cancel = true;
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
+                    ActiveRequestCount--;
+                    this.OnDownloadFinished(EventArgs.Empty);
                 }
             }
-
-            this.OnDownloadFinished(EventArgs.Empty);
+            catch (Exception ex)
+            {
+                ActiveRequestCount--;
+                throw;
+            }
         }
     }
 }

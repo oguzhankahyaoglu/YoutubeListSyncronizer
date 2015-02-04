@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -17,6 +18,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Kahia.Common.Extensions.ConversionExtensions;
+using Kahia.Common.Extensions.GeneralExtensions;
 using Kahia.Common.Extensions.StringExtensions;
 using YoutubeListSyncronizer.Library;
 
@@ -105,6 +107,8 @@ namespace YoutubeListSyncronizer
             if (videoFolder.IsNullOrEmptyString())
                 return;
             btnDownload.Enabled = btnFetchPlaylist.Enabled = false;
+            VideoDownloader.MaxActiveRequestCount = numericUpDown.Value.ToInt();
+            Debug.WriteLine("VideoDownloader.MaxActiveRequestCount : " + VideoDownloader.MaxActiveRequestCount);
             StartDownloading(videoFolder);
         }
 
@@ -136,7 +140,7 @@ namespace YoutubeListSyncronizer
                                                            if (innerWorker.IsSuccessful)
                                                                text = innerWorker.IsAlreadyExists ? "Already exists." : "Completed!";
                                                            else
-                                                               text = "Failed to find resolution: " + (innerWorker.Exception != null ? innerWorker.Exception.Message : "");
+                                                               text = "Failed to find resolution: " + innerWorker.Exception.GetExceptionString();
                                                        }
                                                        listView.Items[itemIndex].SubItems[3].Text = text;
                                                        progressBar.Value = Math.Min(100, Convert.ToInt32(ProgressArr.Sum() / (CountOfVideos * 1.0)));

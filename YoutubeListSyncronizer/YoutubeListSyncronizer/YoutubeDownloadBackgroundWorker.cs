@@ -38,7 +38,7 @@ namespace YoutubeListSyncronizer
             try
             {
                 var videoInfos = DownloadUrlResolver.GetDownloadUrls(DownloadUrl, false);
-                var video = videoInfos.Where(info => info.VideoType == VideoType.Mp4 && info.Resolution <= MaxResolution)
+                var video = videoInfos.Where(info => info.VideoType == VideoType.Mp4 && info.Resolution <= MaxResolution && info.AudioType != AudioType.Unknown)
                     .OrderByDescending(info => info.Resolution).FirstOrDefault();
 
                 if (video == null)
@@ -50,7 +50,7 @@ namespace YoutubeListSyncronizer
                     DownloadUrlResolver.DecryptDownloadUrl(video);
 
                 //var downloadFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyVideos) + "\\Youtube";
-                var fileName = "{0:D4} - {1}_{3}p.{2}".FormatString(Index, RemoveIllegalPathCharacters(video.Title), video.VideoExtension, video.Resolution);
+                var fileName = "{0:D4} - {1}_{3}p{2}".FormatString(Index, RemoveIllegalPathCharacters(video.Title).Left(100), video.VideoExtension, video.Resolution);
                 var downloadPath = Path.Combine(DownloadFolder, fileName);
                 if (!File.Exists(downloadPath))
                 {
