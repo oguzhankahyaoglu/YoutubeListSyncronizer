@@ -50,7 +50,7 @@ namespace YoutubeListSyncronizer
                     DownloadUrlResolver.DecryptDownloadUrl(video);
 
                 //var downloadFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyVideos) + "\\Youtube";
-                var fileName = "{0:D4} - {1}.{2}".FormatString(Index, RemoveIllegalPathCharacters(video.Title), video.VideoExtension);
+                var fileName = "{0:D4} - {1}_{3}p.{2}".FormatString(Index, RemoveIllegalPathCharacters(video.Title), video.VideoExtension, video.Resolution);
                 var downloadPath = Path.Combine(DownloadFolder, fileName);
                 if (!File.Exists(downloadPath))
                 {

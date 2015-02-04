@@ -147,6 +147,8 @@ namespace YoutubeListSyncronizer
                                                           var _index = args.UserState.ToNullableInt();
                                                           if (_index != null)
                                                               listView.Items[_index.Value].SubItems[3].Text = "Complete!";
+                                                          if (completed >= CountOfVideos)
+                                                              MessageBox.Show("Completed Syncronization!", "Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                                       };
                 innerWorker.RunWorkerAsync();
                 index++;
