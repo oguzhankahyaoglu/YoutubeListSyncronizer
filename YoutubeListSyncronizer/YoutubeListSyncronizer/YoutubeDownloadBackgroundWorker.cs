@@ -37,10 +37,7 @@ namespace YoutubeListSyncronizer
             IsAlreadyExists = false;
             try
             {
-                var videoInfos = DownloadUrlResolver.GetDownloadUrls(DownloadUrl, false);
-                var video = videoInfos.Where(info => info.VideoType == VideoType.Mp4 && info.Resolution <= MaxResolution && info.AudioType != AudioType.Unknown)
-                    .OrderByDescending(info => info.Resolution).FirstOrDefault();
-
+                var video = FindVideoInfo();
                 if (video == null)
                 {
                     IsSuccessful = false;
@@ -71,6 +68,18 @@ namespace YoutubeListSyncronizer
                 Exception = ex;
                 ReportProgress(100, Index);
             }
+        }
+
+        private VideoInfo FindVideoInfo()
+        {
+            var videoInfos = DownloadUrlResolver.GetDownloadUrls(DownloadUrl, false);
+            var videosWithAudio = videoInfos.Where(info => info.AudioType != AudioType.Unknown).OrderByDescending(info => info.Resolution);
+            var mp4Videos = videosWithAudio.Where(info => info.VideoType == VideoType.Mp4);
+            var resolutionLimitedVideos = mp4Videos.Where(info => info.Resolution <= MaxResolution);
+            var video = resolutionLimitedVideos.FirstOrDefault()
+                ?? mp4Videos.FirstOrDefault();
+            Debug.WriteLine(video);
+            return video;
         }
 
         //private static void DownloadAudio(IEnumerable<VideoInfo> videoInfos)

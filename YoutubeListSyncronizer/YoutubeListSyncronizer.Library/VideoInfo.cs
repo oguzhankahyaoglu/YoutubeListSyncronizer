@@ -205,7 +205,7 @@ namespace YoutubeListSyncronizer.Library
 
         public override string ToString()
         {
-            return string.Format("Full Title: {0}, Type: {1}, Resolution: {2}p", this.Title + this.VideoExtension, this.VideoType, this.Resolution);
+            return string.Format("Full Title: {0}, Type: {1}, Resolution: {2}p, AudioType:{3}, AudioBitrate:{4}, AudioExtension:{5}", this.Title + this.VideoExtension, this.VideoType, this.Resolution, this.AudioType, this.AudioBitrate,this.AudioExtension);
         }
     }
 }
