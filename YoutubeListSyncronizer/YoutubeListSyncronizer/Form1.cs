@@ -30,7 +30,7 @@ namespace YoutubeListSyncronizer
         {
             InitializeComponent();
             cbmMaxRes.Items.AddRange(MaxResolutions.Cast<object>().ToArray());
-            cbmMaxRes.SelectedIndex = 2;
+            cbmMaxRes.SelectedIndex = 1;
         }
 
         private YoutubeListDownloadWorker listWorker;
