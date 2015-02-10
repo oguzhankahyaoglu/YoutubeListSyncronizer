@@ -9,6 +9,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.AccessControl;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -38,32 +39,87 @@ namespace YoutubeListSyncronizer
         {
             btnFetchPlaylist.Enabled = false;
             var playlistId = ParsePlaylistId(txtPlaylist.Text);
-            listWorker = new YoutubeListDownloadWorker(playlistId);
-            progressBar.Show();
-            listWorker.ProgressChanged += (o, args) =>
-                                              {
-                                                  progressBar.Value = Math.Min(100, args.ProgressPercentage);
-                                              };
-            listWorker.RunWorkerCompleted += (o, args) =>
-                                             {
-                                                 MessageBox.Show("Total videos in this list:" + listWorker.TotalVideoCount);
-                                                 btnDownload.Enabled = true;
-                                                 listView.Items.Clear();
-                                                 var index = 1;
-
-                                                 var orderedDic = listWorker.VideoIDsDictionary.Reverse();
-                                                 foreach (var kvp in orderedDic)
+            if (playlistId != null)
+            {
+                listWorker = new YoutubeListDownloadWorker(playlistId);
+                progressBar.Show();
+                listWorker.ProgressChanged += (o, args) =>
+                                                  {
+                                                      progressBar.Value = Math.Min(100, args.ProgressPercentage);
+                                                  };
+                listWorker.RunWorkerCompleted += (o, args) =>
                                                  {
-                                                     var item = new ListViewItem(new[] { index.ToString("D4"), kvp.Key, kvp.Value, "" });
-                                                     listView.Items.Add(item);
-                                                     index++;
-                                                 }
-                                                 progressBar.Hide();
-                                             };
-            listWorker.RunWorkerAsync();
+                                                     MessageBox.Show("Total videos in this list:" + listWorker.TotalVideoCount);
+                                                     btnDownload.Enabled = true;
+                                                     listView.Items.Clear();
+                                                     var index = 1;
+
+                                                     var orderedDic = listWorker.VideoIDsDictionary.Reverse();
+                                                     foreach (var kvp in orderedDic)
+                                                     {
+                                                         var item = new ListViewItem(new[] { index.ToString("D4"), kvp.Key, kvp.Value, "" });
+                                                         listView.Items.Add(item);
+                                                         index++;
+                                                     }
+                                                     progressBar.Hide();
+                                                 };
+                listWorker.RunWorkerAsync();
+            }else
+            {
+                var youtubeVideoID = ParseVideoID(txtPlaylist.Text);
+                if(youtubeVideoID == null)
+                {
+                    MessageBox.Show("'{0}' is neither a Youtube Playlist nor a Youtube Video Link! Try links in other formats or report if you think this is a bug.","Url Wrong Format", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+                var item = new ListViewItem(new[] { 1.ToString("D4"), youtubeVideoID, txtPlaylist.Text, "" });
+                listView.Items.Add(item);
+                btnDownload.Enabled = true;
+                btnFetchPlaylist.Enabled = true;
+                progressBar.Hide();
+                MessageBox.Show("The url is a youtube video link, instead of a playlist. Single video will be downloaded.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
         #region Helpers
+
+        public static bool HasWritePermissionOnDir(string path)
+        {
+            var writeAllow = false;
+            var writeDeny = false;
+            var accessControlList = Directory.GetAccessControl(path);
+            if (accessControlList == null)
+                return false;
+            var accessRules = accessControlList.GetAccessRules(true, true,
+                                        typeof(System.Security.Principal.SecurityIdentifier));
+            if (accessRules == null)
+                return false;
+
+            foreach (FileSystemAccessRule rule in accessRules)
+            {
+                if ((FileSystemRights.Write & rule.FileSystemRights) != FileSystemRights.Write)
+                    continue;
+
+                if (rule.AccessControlType == AccessControlType.Allow)
+                    writeAllow = true;
+                else if (rule.AccessControlType == AccessControlType.Deny)
+                    writeDeny = true;
+            }
+
+            return writeAllow && !writeDeny;
+        }
+
+        private string ParseVideoID(string url)
+        {
+            String normalizedUrl;
+            if(DownloadUrlResolver.TryNormalizeYoutubeUrl(url, out normalizedUrl))
+            {
+                var qscoll = ParseQueryString(normalizedUrl);
+                var ytid = qscoll["v"];
+                return ytid;
+            }
+            return null;
+        }
 
         public static NameValueCollection ParseQueryString(string s)
         {
@@ -92,13 +148,13 @@ namespace YoutubeListSyncronizer
             return nvc;
         }
 
-        #endregion
-
         private string ParsePlaylistId(string link)
         {
             var qscoll = ParseQueryString(link);
             return qscoll["list"];
         }
+
+        #endregion
 
         private void btnDownload_Click(object sender, EventArgs e)
         {
@@ -106,6 +162,11 @@ namespace YoutubeListSyncronizer
             var videoFolder = folderBrowser.SelectedPath;
             if (videoFolder.IsNullOrEmptyString())
                 return;
+            if (!HasWritePermissionOnDir(videoFolder))
+            {
+                MessageBox.Show("The path '{0}' could not be accessedç Try to run this application as administrator, or select another path.".FormatString(videoFolder), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
             btnDownload.Enabled = btnFetchPlaylist.Enabled = false;
             VideoDownloader.MaxActiveRequestCount = numericUpDown.Value.ToInt();
             Debug.WriteLine("VideoDownloader.MaxActiveRequestCount : " + VideoDownloader.MaxActiveRequestCount);
@@ -120,7 +181,7 @@ namespace YoutubeListSyncronizer
         {
             var index = 0;
             var completed = 0;
-            var videoIDsDictionary = listWorker.VideoIDsDictionary.Reverse();
+            var videoIDsDictionary = listWorker != null ? listWorker.VideoIDsDictionary.Reverse() : new Dictionary<string, string> { {listView.Items[0].SubItems[1].Text, listView.Items[0].SubItems[2].Text} };
             CountOfVideos = videoIDsDictionary.Count();
             progressBar.Value = 0;
             progressBar.Show();
@@ -152,7 +213,10 @@ namespace YoutubeListSyncronizer
                                                           if (_index != null)
                                                               listView.Items[_index.Value].SubItems[3].Text = "Complete!";
                                                           if (completed >= CountOfVideos)
+                                                          {
                                                               MessageBox.Show("Completed Syncronization!", "Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                                              btnFetchPlaylist.Enabled = true;
+                                                          }
                                                       };
                 innerWorker.RunWorkerAsync();
                 index++;
