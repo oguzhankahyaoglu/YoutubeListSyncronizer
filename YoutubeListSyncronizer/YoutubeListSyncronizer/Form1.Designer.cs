@@ -47,6 +47,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
+            this.btnCheckAll = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
@@ -58,7 +59,7 @@
             this.txtPlaylist.Location = new System.Drawing.Point(167, 3);
             this.txtPlaylist.Multiline = true;
             this.txtPlaylist.Name = "txtPlaylist";
-            this.txtPlaylist.Size = new System.Drawing.Size(487, 19);
+            this.txtPlaylist.Size = new System.Drawing.Size(487, 29);
             this.txtPlaylist.TabIndex = 0;
             this.txtPlaylist.Text = "https://www.youtube.com/playlist?list=FL0O6m-jrVllHCo94bJ-a9bA";
             // 
@@ -67,7 +68,7 @@
             this.btnFetchPlaylist.Dock = System.Windows.Forms.DockStyle.Fill;
             this.btnFetchPlaylist.Location = new System.Drawing.Point(660, 3);
             this.btnFetchPlaylist.Name = "btnFetchPlaylist";
-            this.btnFetchPlaylist.Size = new System.Drawing.Size(180, 19);
+            this.btnFetchPlaylist.Size = new System.Drawing.Size(180, 29);
             this.btnFetchPlaylist.TabIndex = 1;
             this.btnFetchPlaylist.Text = "Fetch Videos ";
             this.btnFetchPlaylist.UseVisualStyleBackColor = true;
@@ -92,7 +93,7 @@
             this.label1.Location = new System.Drawing.Point(86, 5);
             this.label1.Margin = new System.Windows.Forms.Padding(5);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(73, 15);
+            this.label1.Size = new System.Drawing.Size(73, 25);
             this.label1.TabIndex = 3;
             this.label1.Text = "Youtube Link:";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -101,9 +102,9 @@
             // 
             this.btnDownload.Dock = System.Windows.Forms.DockStyle.Fill;
             this.btnDownload.Enabled = false;
-            this.btnDownload.Location = new System.Drawing.Point(660, 459);
+            this.btnDownload.Location = new System.Drawing.Point(660, 633);
             this.btnDownload.Name = "btnDownload";
-            this.btnDownload.Size = new System.Drawing.Size(180, 19);
+            this.btnDownload.Size = new System.Drawing.Size(180, 29);
             this.btnDownload.TabIndex = 4;
             this.btnDownload.Text = "Start Downloading";
             this.btnDownload.UseVisualStyleBackColor = true;
@@ -111,6 +112,7 @@
             // 
             // listView
             // 
+            this.listView.CheckBoxes = true;
             this.listView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1,
             this.columnHeader2,
@@ -120,10 +122,10 @@
             this.listView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.listView.FullRowSelect = true;
             this.listView.GridLines = true;
-            this.listView.Location = new System.Drawing.Point(3, 28);
+            this.listView.Location = new System.Drawing.Point(3, 38);
             this.listView.MultiSelect = false;
             this.listView.Name = "listView";
-            this.listView.Size = new System.Drawing.Size(837, 425);
+            this.listView.Size = new System.Drawing.Size(837, 589);
             this.listView.TabIndex = 5;
             this.listView.UseCompatibleStateImageBehavior = false;
             this.listView.View = System.Windows.Forms.View.Details;
@@ -132,7 +134,6 @@
             // columnHeader1
             // 
             this.columnHeader1.Text = "#";
-            this.columnHeader1.Width = 38;
             // 
             // columnHeader2
             // 
@@ -142,7 +143,7 @@
             // columnHeader3
             // 
             this.columnHeader3.Text = "Video Title";
-            this.columnHeader3.Width = 415;
+            this.columnHeader3.Width = 396;
             // 
             // columnHeader4
             // 
@@ -153,9 +154,9 @@
             // 
             this.tableLayoutPanel1.SetColumnSpan(this.progressBar, 3);
             this.progressBar.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.progressBar.Location = new System.Drawing.Point(3, 484);
+            this.progressBar.Location = new System.Drawing.Point(3, 668);
             this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(837, 21);
+            this.progressBar.Size = new System.Drawing.Size(837, 29);
             this.progressBar.Step = 1;
             this.progressBar.TabIndex = 6;
             this.progressBar.Visible = false;
@@ -184,6 +185,16 @@
             // 
             this.numericUpDown.Location = new System.Drawing.Point(129, 0);
             this.numericUpDown.Margin = new System.Windows.Forms.Padding(0);
+            this.numericUpDown.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.numericUpDown.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             this.numericUpDown.Name = "numericUpDown";
             this.numericUpDown.Size = new System.Drawing.Size(59, 20);
             this.numericUpDown.TabIndex = 9;
@@ -216,6 +227,7 @@
             this.tableLayoutPanel1.Controls.Add(this.progressBar, 0, 3);
             this.tableLayoutPanel1.Controls.Add(this.btnDownload, 2, 2);
             this.tableLayoutPanel1.Controls.Add(this.flowLayoutPanel1, 1, 2);
+            this.tableLayoutPanel1.Controls.Add(this.btnCheckAll, 0, 2);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -224,7 +236,7 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 85F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 5F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 5F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(843, 508);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(843, 700);
             this.tableLayoutPanel1.TabIndex = 11;
             // 
             // flowLayoutPanel1
@@ -234,16 +246,27 @@
             this.flowLayoutPanel1.Controls.Add(this.label2);
             this.flowLayoutPanel1.Controls.Add(this.cbmMaxRes);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(167, 459);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(167, 633);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(487, 19);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(487, 29);
             this.flowLayoutPanel1.TabIndex = 7;
+            // 
+            // btnCheckAll
+            // 
+            this.btnCheckAll.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnCheckAll.Location = new System.Drawing.Point(3, 633);
+            this.btnCheckAll.Name = "btnCheckAll";
+            this.btnCheckAll.Size = new System.Drawing.Size(158, 29);
+            this.btnCheckAll.TabIndex = 8;
+            this.btnCheckAll.Text = "Check/Uncheck ALL";
+            this.btnCheckAll.UseVisualStyleBackColor = true;
+            this.btnCheckAll.Click += new System.EventHandler(this.btnCheckAll_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(843, 508);
+            this.ClientSize = new System.Drawing.Size(843, 700);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.lblPercent);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -280,6 +303,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
+        private System.Windows.Forms.Button btnCheckAll;
     }
 }
 

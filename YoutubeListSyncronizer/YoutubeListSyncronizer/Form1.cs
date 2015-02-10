@@ -167,7 +167,7 @@ namespace YoutubeListSyncronizer
                 MessageBox.Show("The path '{0}' could not be accessedç Try to run this application as administrator, or select another path.".FormatString(videoFolder), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            btnDownload.Enabled = btnFetchPlaylist.Enabled = false;
+            btnDownload.Enabled = btnFetchPlaylist.Enabled = listView.Enabled = false;
             VideoDownloader.MaxActiveRequestCount = numericUpDown.Value.ToInt();
             Debug.WriteLine("VideoDownloader.MaxActiveRequestCount : " + VideoDownloader.MaxActiveRequestCount);
             StartDownloading(videoFolder);
@@ -181,13 +181,20 @@ namespace YoutubeListSyncronizer
         {
             var index = 0;
             var completed = 0;
-            var videoIDsDictionary = listWorker != null ? listWorker.VideoIDsDictionary.Reverse() : new Dictionary<string, string> { {listView.Items[0].SubItems[1].Text, listView.Items[0].SubItems[2].Text} };
-            CountOfVideos = videoIDsDictionary.Count();
+            IEnumerable<KeyValuePair<string, string>> selectedDictionary;
+            var videoIDsDictionary = PrepareVideoIDsDictionary(out selectedDictionary);
+            CountOfVideos = selectedDictionary.Count();
             progressBar.Value = 0;
             progressBar.Show();
-            ProgressArr = new int[CountOfVideos];
+            ProgressArr = new int[videoIDsDictionary.Count()];
             foreach (var kvp in videoIDsDictionary)
             {
+                if (!listView.Items[index].Checked)
+                {
+                    index++;
+                    continue;
+                }
+
                 var videoID = kvp.Key;
                 var url = "http://www.youtube.com/watch?v=" + videoID;
                 var innerWorker = new YoutubeDownloadBackgroundWorker(videoFolder, url, index, MaxResolutions[cbmMaxRes.SelectedIndex]);
@@ -204,6 +211,7 @@ namespace YoutubeListSyncronizer
                                                                text = "Failed to find resolution: " + innerWorker.Exception.GetExceptionString();
                                                        }
                                                        listView.Items[itemIndex].SubItems[3].Text = text;
+                                                       listView.Items[itemIndex].EnsureVisible();
                                                        progressBar.Value = Math.Min(100, Convert.ToInt32(ProgressArr.Sum() / (CountOfVideos * 1.0)));
                                                    };
                 innerWorker.RunWorkerCompleted += (o, args) =>
@@ -211,16 +219,27 @@ namespace YoutubeListSyncronizer
                                                           completed++;
                                                           var _index = args.UserState.ToNullableInt();
                                                           if (_index != null)
+                                                          {
                                                               listView.Items[_index.Value].SubItems[3].Text = "Complete!";
+                                                              listView.Items[_index.Value].EnsureVisible();
+                                                          }
                                                           if (completed >= CountOfVideos)
                                                           {
                                                               MessageBox.Show("Completed Syncronization!", "Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                                               btnFetchPlaylist.Enabled = true;
+                                                              listView.Enabled = true;
                                                           }
                                                       };
                 innerWorker.RunWorkerAsync();
                 index++;
             }
+        }
+
+        private IEnumerable<KeyValuePair<string, string>> PrepareVideoIDsDictionary(out IEnumerable<KeyValuePair<string, string>> selectedKVPs)
+        {
+            var dictionary = listWorker != null ? listWorker.VideoIDsDictionary : new Dictionary<string, string> { { listView.Items[0].SubItems[1].Text, listView.Items[0].SubItems[2].Text } };
+            selectedKVPs = dictionary.Where((kvp, i) => listView.Items[i].Checked);
+            return dictionary;
         }
 
 
@@ -242,6 +261,14 @@ namespace YoutubeListSyncronizer
                 }
             }
             mLastPos = e.Location;
+        }
+
+        private void btnCheckAll_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < listView.Items.Count; i++)
+            {
+                listView.Items[i].Checked = !listView.Items[i].Checked;
+            }
         }
     }
 }
