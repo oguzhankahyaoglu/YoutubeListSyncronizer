@@ -65,10 +65,8 @@
     <Compile Include="WebClientExtended.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="YoutubeDownloadBackgroundWorker.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="YoutubeListDownloadWorker.cs">
+    <Compile Include="YTVideoDownloader.cs" />
+    <Compile Include="YTListDownloadWorker.cs">
       <SubType>Component</SubType>
     </Compile>
     <EmbeddedResource Include="Form1.resx">

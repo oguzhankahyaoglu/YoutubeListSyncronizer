@@ -8,76 +8,121 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Kahia.Common.Extensions.GeneralExtensions;
 using Kahia.Common.Extensions.StringExtensions;
 using YoutubeListSyncronizer.Library;
 
 namespace YoutubeListSyncronizer
 {
-    public class YoutubeDownloadBackgroundWorker : BackgroundWorker
+    public class YTVideoDownloader
     {
+        #region SubClasses
+
+        public class ParsedVideo
+        {
+            public String VideoID { get; set; }
+            public String VideoURL { get; set; }
+            public bool IsSelected { get; set; }
+        }
+
+        public class Status
+        {
+            public int Progress;
+            public int Index;
+            public bool IsSuccessful { get; set; }
+            public bool IsSelected { get; set; }
+            public bool IsAlreadyExists { get; set; }
+            public Exception Exception { get; set; }
+            public override string ToString()
+            {
+                return "Progress: {0}, IsSelected: {4}, IsSuccess: {1}, IsAlreadyExist: {2}, Ex: {3}".FormatString(Progress, IsSuccessful, IsAlreadyExists, Exception.GetExceptionString(), IsSelected);
+            }
+        }
+
+        public class Args
+        {
+            public ParsedVideo[] ParsedVideos;
+            public int MaxRes;
+            public String VideoFolder;
+        }
+
+        #endregion
+
         private String DownloadUrl;
         private String DownloadFolder;
         private int Index;
         private int MaxResolution;
-        public bool IsSuccessful { get; private set; }
-        public bool IsAlreadyExists { get; private set; }
-        public Exception Exception { get; private set; }
-        public YoutubeDownloadBackgroundWorker(string downloadFolder, string downloadUrl, int index, int maxResolution)
+        private bool IsSelectedVideo;
+
+        public static Status[] StatusArr;
+
+        public YTVideoDownloader(string downloadFolder, string downloadUrl, int index, int maxResolution, bool isSelected)
         {
             DownloadUrl = downloadUrl;
             DownloadFolder = downloadFolder;
             Index = index;
             MaxResolution = maxResolution;
-            WorkerSupportsCancellation = true;
-            WorkerReportsProgress = true;
+            IsSelectedVideo = isSelected;
+            StatusArr[Index] = new Status { IsSelected = isSelected, Index = index};
         }
 
-        protected override void OnDoWork(DoWorkEventArgs e)
+        public void Start()
         {
-            IsAlreadyExists = false;
+            StatusArr[Index].IsAlreadyExists = false;
+            if (!IsSelectedVideo)
+            {
+                StatusArr[Index].IsSuccessful = true;
+                StatusArr[Index].Progress = 100;
+                return;
+            }
             try
             {
                 var video = FindVideoInfo();
                 if (video == null)
                 {
-                    IsSuccessful = false;
-                    ReportProgress(100, Index);
+                    StatusArr[Index].IsSuccessful = false;
+                    StatusArr[Index].Progress = 100;
+                    return;
                 }
                 if (video.RequiresDecryption)
                     DownloadUrlResolver.DecryptDownloadUrl(video);
 
-                //var downloadFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyVideos) + "\\Youtube";
-                var fileName = "{0:D4} - {1}_{3}p{2}".FormatString(Index, RemoveIllegalPathCharacters(video.Title).Left(100), video.VideoExtension, video.Resolution);
+                //var fileName = "{0:D4} - {1}_{3}p{2}".FormatString(Index, RemoveIllegalPathCharacters(video.Title).Left(100), video.VideoExtension, video.Resolution);
+                //var fileName = "{0} - {1}_{3}p{2}".FormatString(video.VideoID, RemoveIllegalPathCharacters(video.Title).Left(100), video.VideoExtension, video.Resolution);
+                var fileName = "{1}_{3}p{2}".FormatString(video.VideoID, RemoveIllegalPathCharacters(video.Title).Left(100), video.VideoExtension, video.Resolution);
                 var downloadPath = Path.Combine(DownloadFolder, fileName);
                 if (!File.Exists(downloadPath))
                 {
                     var videoDownloader = new VideoDownloader(video, downloadPath);
-                    videoDownloader.DownloadProgressChanged += (sender, args) => ReportProgress(Convert.ToInt32(args.ProgressPercentage), Index);
+                    videoDownloader.DownloadProgressChanged += (sender, args) => StatusArr[Index].Progress = Convert.ToInt32(args.ProgressPercentage);
                     videoDownloader.Execute();
                 }
                 else
-                    IsAlreadyExists = true;
-                IsSuccessful = true;
-                ReportProgress(100, Index);
+                    StatusArr[Index].IsAlreadyExists = true;
+                StatusArr[Index].IsSuccessful = true;
+                StatusArr[Index].Progress = 100;
             }
             catch (Exception ex)
             {
                 if (Debugger.IsAttached)
                     throw ex;
-                IsSuccessful = false;
-                Exception = ex;
-                ReportProgress(100, Index);
+                StatusArr[Index].IsSuccessful = false;
+                StatusArr[Index].Exception = ex;
+                StatusArr[Index].Progress = 100;
             }
         }
 
         private VideoInfo FindVideoInfo()
         {
-            var videoInfos = DownloadUrlResolver.GetDownloadUrls(DownloadUrl, false);
+            String videoID;
+            var videoInfos = DownloadUrlResolver.GetDownloadUrls(DownloadUrl, out videoID, false);
             var videosWithAudio = videoInfos.Where(info => info.AudioType != AudioType.Unknown).OrderByDescending(info => info.Resolution);
             var mp4Videos = videosWithAudio.Where(info => info.VideoType == VideoType.Mp4);
             var resolutionLimitedVideos = mp4Videos.Where(info => info.Resolution <= MaxResolution);
             var video = resolutionLimitedVideos.FirstOrDefault()
                 ?? mp4Videos.FirstOrDefault();
+            if (video != null)
+                video.VideoID = videoID;
             Debug.WriteLine(video);
             return video;
         }

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.txtPlaylist = new System.Windows.Forms.TextBox();
             this.btnFetchPlaylist = new System.Windows.Forms.Button();
@@ -43,12 +44,10 @@
             this.progressBar = new System.Windows.Forms.ProgressBar();
             this.cbmMaxRes = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.numericUpDown = new System.Windows.Forms.NumericUpDown();
-            this.label3 = new System.Windows.Forms.Label();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.btnCheckAll = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown)).BeginInit();
+            this.timerDownloader = new System.Windows.Forms.Timer(this.components);
             this.tableLayoutPanel1.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
@@ -56,19 +55,19 @@
             // txtPlaylist
             // 
             this.txtPlaylist.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtPlaylist.Location = new System.Drawing.Point(167, 3);
+            this.txtPlaylist.Location = new System.Drawing.Point(165, 3);
             this.txtPlaylist.Multiline = true;
             this.txtPlaylist.Name = "txtPlaylist";
-            this.txtPlaylist.Size = new System.Drawing.Size(487, 29);
+            this.txtPlaylist.Size = new System.Drawing.Size(483, 29);
             this.txtPlaylist.TabIndex = 0;
             this.txtPlaylist.Text = "https://www.youtube.com/playlist?list=FL0O6m-jrVllHCo94bJ-a9bA";
             // 
             // btnFetchPlaylist
             // 
             this.btnFetchPlaylist.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnFetchPlaylist.Location = new System.Drawing.Point(660, 3);
+            this.btnFetchPlaylist.Location = new System.Drawing.Point(654, 3);
             this.btnFetchPlaylist.Name = "btnFetchPlaylist";
-            this.btnFetchPlaylist.Size = new System.Drawing.Size(180, 29);
+            this.btnFetchPlaylist.Size = new System.Drawing.Size(186, 29);
             this.btnFetchPlaylist.TabIndex = 1;
             this.btnFetchPlaylist.Text = "Fetch Videos ";
             this.btnFetchPlaylist.UseVisualStyleBackColor = true;
@@ -84,13 +83,14 @@
             // 
             // folderBrowser
             // 
+            this.folderBrowser.Description = "Select download folder";
             this.folderBrowser.RootFolder = System.Environment.SpecialFolder.MyComputer;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.label1.Location = new System.Drawing.Point(86, 5);
+            this.label1.Location = new System.Drawing.Point(84, 5);
             this.label1.Margin = new System.Windows.Forms.Padding(5);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(73, 25);
@@ -102,9 +102,9 @@
             // 
             this.btnDownload.Dock = System.Windows.Forms.DockStyle.Fill;
             this.btnDownload.Enabled = false;
-            this.btnDownload.Location = new System.Drawing.Point(660, 633);
+            this.btnDownload.Location = new System.Drawing.Point(654, 633);
             this.btnDownload.Name = "btnDownload";
-            this.btnDownload.Size = new System.Drawing.Size(180, 29);
+            this.btnDownload.Size = new System.Drawing.Size(186, 29);
             this.btnDownload.TabIndex = 4;
             this.btnDownload.Text = "Start Downloading";
             this.btnDownload.UseVisualStyleBackColor = true;
@@ -165,7 +165,7 @@
             // 
             this.cbmMaxRes.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbmMaxRes.FormattingEnabled = true;
-            this.cbmMaxRes.Location = new System.Drawing.Point(307, 0);
+            this.cbmMaxRes.Location = new System.Drawing.Point(119, 0);
             this.cbmMaxRes.Margin = new System.Windows.Forms.Padding(0);
             this.cbmMaxRes.Name = "cbmMaxRes";
             this.cbmMaxRes.Size = new System.Drawing.Size(100, 21);
@@ -174,52 +174,19 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(191, 3);
+            this.label2.Location = new System.Drawing.Point(3, 3);
             this.label2.Margin = new System.Windows.Forms.Padding(3);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(113, 13);
             this.label2.TabIndex = 8;
             this.label2.Text = "Max Video Resolution:";
             // 
-            // numericUpDown
-            // 
-            this.numericUpDown.Location = new System.Drawing.Point(129, 0);
-            this.numericUpDown.Margin = new System.Windows.Forms.Padding(0);
-            this.numericUpDown.Maximum = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-            this.numericUpDown.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.numericUpDown.Name = "numericUpDown";
-            this.numericUpDown.Size = new System.Drawing.Size(59, 20);
-            this.numericUpDown.TabIndex = 9;
-            this.numericUpDown.Value = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(3, 3);
-            this.label3.Margin = new System.Windows.Forms.Padding(3);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(123, 13);
-            this.label3.TabIndex = 10;
-            this.label3.Text = "Max Parallel Downloads:";
-            // 
             // tableLayoutPanel1
             // 
             this.tableLayoutPanel1.ColumnCount = 3;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 24.96195F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 75.03806F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 185F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 191F));
             this.tableLayoutPanel1.Controls.Add(this.label1, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.txtPlaylist, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.listView, 0, 1);
@@ -241,14 +208,12 @@
             // 
             // flowLayoutPanel1
             // 
-            this.flowLayoutPanel1.Controls.Add(this.label3);
-            this.flowLayoutPanel1.Controls.Add(this.numericUpDown);
             this.flowLayoutPanel1.Controls.Add(this.label2);
             this.flowLayoutPanel1.Controls.Add(this.cbmMaxRes);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(167, 633);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(165, 633);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(487, 29);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(483, 29);
             this.flowLayoutPanel1.TabIndex = 7;
             // 
             // btnCheckAll
@@ -256,11 +221,16 @@
             this.btnCheckAll.Dock = System.Windows.Forms.DockStyle.Fill;
             this.btnCheckAll.Location = new System.Drawing.Point(3, 633);
             this.btnCheckAll.Name = "btnCheckAll";
-            this.btnCheckAll.Size = new System.Drawing.Size(158, 29);
+            this.btnCheckAll.Size = new System.Drawing.Size(156, 29);
             this.btnCheckAll.TabIndex = 8;
             this.btnCheckAll.Text = "Check/Uncheck ALL";
             this.btnCheckAll.UseVisualStyleBackColor = true;
             this.btnCheckAll.Click += new System.EventHandler(this.btnCheckAll_Click);
+            // 
+            // timerDownloader
+            // 
+            this.timerDownloader.Interval = 2000;
+            this.timerDownloader.Tick += new System.EventHandler(this.timerDownloader_Tick);
             // 
             // Form1
             // 
@@ -273,7 +243,6 @@
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Youtube Sycronizer";
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown)).EndInit();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.flowLayoutPanel1.ResumeLayout(false);
@@ -299,11 +268,10 @@
         private System.Windows.Forms.ProgressBar progressBar;
         private System.Windows.Forms.ComboBox cbmMaxRes;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.NumericUpDown numericUpDown;
-        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
         private System.Windows.Forms.Button btnCheckAll;
+        private System.Windows.Forms.Timer timerDownloader;
     }
 }
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace YoutubeListSyncronizer.Library
 {
@@ -152,6 +153,11 @@ namespace YoutubeListSyncronizer.Library
         /// This can be achieved with the <see cref="DownloadUrlResolver.DecryptDownloadUrl"/>
         /// </summary>
         public bool RequiresDecryption { get; internal set; }
+
+        /// <summary>
+        /// Youtube Video ID
+        /// </summary>
+        public String VideoID { get; set; }
 
         /// <summary>
         /// Gets the resolution of the video.

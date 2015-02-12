@@ -11,13 +11,13 @@ using Kahia.Common.Extensions.StringExtensions;
 
 namespace YoutubeListSyncronizer
 {
-    public class YoutubeListDownloadWorker : BackgroundWorker
+    public class YTListDownloadWorker : BackgroundWorker
     {
         public Dictionary<string, string> VideoIDsDictionary { get; private set; }
         public int TotalVideoCount { get; private set; }
 
         private String PlaylistID;
-        public YoutubeListDownloadWorker(String playlistID)
+        public YTListDownloadWorker(String playlistID)
         {
             WorkerSupportsCancellation = true;
             WorkerReportsProgress = true;

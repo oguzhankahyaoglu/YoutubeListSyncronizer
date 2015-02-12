@@ -72,8 +72,9 @@ namespace YoutubeListSyncronizer.Library
         /// An error occurred while downloading the YouTube page html.
         /// </exception>
         /// <exception cref="YoutubeParseException">The Youtube page could not be parsed.</exception>
-        public static IEnumerable<VideoInfo> GetDownloadUrls(string videoUrl, bool decryptSignature = true)
+        public static IEnumerable<VideoInfo> GetDownloadUrls(string videoUrl, out String videoID, bool decryptSignature = true)
         {
+            videoID = "";
             if (videoUrl == null)
                 throw new ArgumentNullException("videoUrl");
 
@@ -87,7 +88,7 @@ namespace YoutubeListSyncronizer.Library
             try
             {
                 var json = LoadJson(videoUrl);
-
+                videoID = json["args"]["video_id"].ToString();
                 string videoTitle = GetVideoTitle(json);
 
                 IEnumerable<ExtractionInfo> downloadUrls = ExtractDownloadUrls(json);
