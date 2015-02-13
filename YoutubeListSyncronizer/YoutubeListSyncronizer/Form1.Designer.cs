@@ -58,16 +58,16 @@
             this.txtPlaylist.Location = new System.Drawing.Point(165, 3);
             this.txtPlaylist.Multiline = true;
             this.txtPlaylist.Name = "txtPlaylist";
-            this.txtPlaylist.Size = new System.Drawing.Size(482, 29);
+            this.txtPlaylist.Size = new System.Drawing.Size(480, 29);
             this.txtPlaylist.TabIndex = 0;
             this.txtPlaylist.Text = "https://www.youtube.com/playlist?list=FL0O6m-jrVllHCo94bJ-a9bA";
             // 
             // btnFetchPlaylist
             // 
             this.btnFetchPlaylist.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnFetchPlaylist.Location = new System.Drawing.Point(653, 3);
+            this.btnFetchPlaylist.Location = new System.Drawing.Point(651, 3);
             this.btnFetchPlaylist.Name = "btnFetchPlaylist";
-            this.btnFetchPlaylist.Size = new System.Drawing.Size(187, 29);
+            this.btnFetchPlaylist.Size = new System.Drawing.Size(189, 29);
             this.btnFetchPlaylist.TabIndex = 1;
             this.btnFetchPlaylist.Text = "Fetch Videos ";
             this.btnFetchPlaylist.UseVisualStyleBackColor = true;
@@ -102,9 +102,9 @@
             // 
             this.btnDownload.Dock = System.Windows.Forms.DockStyle.Fill;
             this.btnDownload.Enabled = false;
-            this.btnDownload.Location = new System.Drawing.Point(653, 633);
+            this.btnDownload.Location = new System.Drawing.Point(651, 633);
             this.btnDownload.Name = "btnDownload";
-            this.btnDownload.Size = new System.Drawing.Size(187, 29);
+            this.btnDownload.Size = new System.Drawing.Size(189, 29);
             this.btnDownload.TabIndex = 4;
             this.btnDownload.Text = "Start Downloading";
             this.btnDownload.UseVisualStyleBackColor = true;
@@ -129,6 +129,8 @@
             this.listView.TabIndex = 5;
             this.listView.UseCompatibleStateImageBehavior = false;
             this.listView.View = System.Windows.Forms.View.Details;
+            this.listView.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.listView_ItemCheck);
+            this.listView.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.listView_ItemChecked);
             this.listView.MouseMove += new System.Windows.Forms.MouseEventHandler(this.listView_MouseMove);
             // 
             // columnHeader1
@@ -186,7 +188,7 @@
             this.tableLayoutPanel1.ColumnCount = 3;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 24.96195F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 75.03806F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 192F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 194F));
             this.tableLayoutPanel1.Controls.Add(this.label1, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.txtPlaylist, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.listView, 0, 1);
@@ -213,7 +215,7 @@
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel1.Location = new System.Drawing.Point(165, 633);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(482, 29);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(480, 29);
             this.flowLayoutPanel1.TabIndex = 7;
             // 
             // btnCheckAll
@@ -243,6 +245,7 @@
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Youtube Sycronizer";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.flowLayoutPanel1.ResumeLayout(false);

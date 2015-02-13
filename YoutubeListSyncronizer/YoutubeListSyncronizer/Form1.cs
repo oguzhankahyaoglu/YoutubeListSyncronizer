@@ -192,18 +192,18 @@ namespace YoutubeListSyncronizer
                 MessageBox.Show("The path '{0}' could not be accessedç Try to run this application as administrator, or select another path.".FormatString(videoFolder), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            btnDownload.Enabled = btnFetchPlaylist.Enabled = listView.Enabled = false;
+            listView.BackColor = Color.LightGray;
+            btnDownload.Enabled = btnFetchPlaylist.Enabled = btnCheckAll.Enabled = false;
+            IsListViewReadOnly = true;
             StartDownloading(videoFolder);
         }
 
         private static readonly int[] MaxResolutions = new[] { 1080, 720, 480, 360 };
 
-        private int LastCompletedDownloadIndex;
         private void StartDownloading(string videoFolder)
         {
             progressBar.Value = 0;
             progressBar.Show();
-            LastCompletedDownloadIndex = -1;
             var maxResolution = MaxResolutions[cbmMaxRes.SelectedIndex];
             var args = new YTVideoDownloader.Args
             {
@@ -214,9 +214,10 @@ namespace YoutubeListSyncronizer
             StartDownloadThread(args);
         }
 
+        private Thread YTDownloadThread;
         private void StartDownloadThread(YTVideoDownloader.Args x)
         {
-            var thread = new Thread(o =>
+            YTDownloadThread = new Thread(o =>
             {
                 var args = (YTVideoDownloader.Args)o;
                 var length = args.ParsedVideos.Length;
@@ -230,7 +231,7 @@ namespace YoutubeListSyncronizer
                     downloader.Start();
                 }
             });
-            thread.Start(x);
+            YTDownloadThread.Start(x);
             timerDownloader.Start();
         }
 
@@ -269,11 +270,13 @@ namespace YoutubeListSyncronizer
         private void timerDownloader_Tick(object sender, EventArgs e)
         {
             var countOfSelectedVideos = ParsedVideos.Count(v => v.IsSelected);
+            var lastDownloaded = YTVideoDownloader.StatusArr.LastOrDefault(s => s != null && s.Progress == 100);
+            var lastCompletedDownloadIndex = lastDownloaded == null ? -1 : lastDownloaded.Index;
             for (int i = 0; i < listView.Items.Count; i++)
             {
                 //Do not update already completed elements again and again
                 var status = YTVideoDownloader.StatusArr[i];
-                if (status == null || i <= LastCompletedDownloadIndex)
+                if (status == null)
                     continue;
 
                 var text = "";
@@ -285,7 +288,6 @@ namespace YoutubeListSyncronizer
                             text = status.IsAlreadyExists ? "Already exists." : "Completed!";
                         else
                             text = "Failed to find resolution: " + status.Exception.GetExceptionString();
-                        LastCompletedDownloadIndex = i;
                     }
                     else
                         text = status.Progress.ToString() + "%";
@@ -293,8 +295,8 @@ namespace YoutubeListSyncronizer
                 listView.Items[i].SubItems[3].Text = text;
             }
             listView.Update();
-            progressBar.Value = Math.Min(100, 
-                Convert.ToInt32(YTVideoDownloader.StatusArr.Where(s=> s != null && s.IsSelected).Sum(s => s.Progress) / (countOfSelectedVideos * 1.0)));
+            progressBar.Value = Math.Min(100,
+                Convert.ToInt32(YTVideoDownloader.StatusArr.Where(s => s != null && s.IsSelected).Sum(s => s.Progress) / (countOfSelectedVideos * 1.0)));
             if (Debugger.IsAttached)
             {
                 Debug.WriteLine("****************************************************************************");
@@ -304,19 +306,45 @@ namespace YoutubeListSyncronizer
                         Debug.WriteLine(index + ": " + YTVideoDownloader.StatusArr[index]);
                 Debug.WriteLine("****************************************************************************");
             }
-            var lastSelectedIndex = YTVideoDownloader.StatusArr.Last(s => s != null && s.IsSelected).Index;
-            if (LastCompletedDownloadIndex >= lastSelectedIndex)
+            if (lastCompletedDownloadIndex >= YTVideoDownloader.StatusArr.Length - 1)
             {
                 timerDownloader.Stop();
                 MessageBox.Show("Completed Syncronization!", "Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                btnFetchPlaylist.Enabled = btnDownload.Enabled = true;
-                listView.Enabled = true;
+                listView.BackColor = Color.White;
+                btnFetchPlaylist.Enabled = btnDownload.Enabled = btnCheckAll.Enabled = true;
+                IsListViewReadOnly = false;
             }
             else
             {
-                var downloadActiveIndex = YTVideoDownloader.StatusArr.Last(s => s != null && s.Progress < 100).Index;
-                listView.Items[downloadActiveIndex].EnsureVisible();
+                //var downloadActiveIndex = YTVideoDownloader.StatusArr.Last(s => s != null && s.Progress < 100).Index;
+                listView.Items[lastCompletedDownloadIndex].EnsureVisible();
             }
         }
+
+        private bool IsListViewReadOnly = false;
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            try
+            {
+                YTDownloadThread.Abort();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.GetExceptionString());
+            }
+        }
+
+        private void listView_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            if (IsListViewReadOnly)
+                e.NewValue = e.CurrentValue;
+        }
+
+        private void listView_ItemChecked(object sender, ItemCheckedEventArgs e)
+        {
+            e.Item.BackColor = e.Item.Checked ? Color.Wheat : Color.White;
+        }
+
+        
     }
 }
