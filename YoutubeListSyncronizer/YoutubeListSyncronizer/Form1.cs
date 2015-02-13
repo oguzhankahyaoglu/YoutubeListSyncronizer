@@ -309,7 +309,7 @@ namespace YoutubeListSyncronizer
             {
                 timerDownloader.Stop();
                 MessageBox.Show("Completed Syncronization!", "Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                btnFetchPlaylist.Enabled = true;
+                btnFetchPlaylist.Enabled = btnDownload.Enabled = true;
                 listView.Enabled = true;
             }
             else

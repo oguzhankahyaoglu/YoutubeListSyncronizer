@@ -104,8 +104,6 @@ namespace YoutubeListSyncronizer
             }
             catch (Exception ex)
             {
-                if (Debugger.IsAttached)
-                    throw ex;
                 StatusArr[Index].IsSuccessful = false;
                 StatusArr[Index].Exception = ex;
                 StatusArr[Index].Progress = 100;
