@@ -317,7 +317,7 @@ namespace YoutubeListSyncronizer
             else
             {
                 //var downloadActiveIndex = YTVideoDownloader.StatusArr.Last(s => s != null && s.Progress < 100).Index;
-                listView.Items[lastCompletedDownloadIndex].EnsureVisible();
+                listView.Items[Math.Min(lastCompletedDownloadIndex + 2, listView.Items.Count - 1)].EnsureVisible();
             }
         }
 
@@ -345,6 +345,6 @@ namespace YoutubeListSyncronizer
             e.Item.BackColor = e.Item.Checked ? Color.Wheat : Color.White;
         }
 
-        
+
     }
 }
