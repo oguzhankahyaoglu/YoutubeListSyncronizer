@@ -21,7 +21,7 @@ namespace YoutubeListSyncronizer
         public class ParsedVideo
         {
             public String VideoID { get; set; }
-            public String VideoURL { get; set; }
+            public String Title { get; set; }
             public bool IsSelected { get; set; }
         }
 
@@ -53,17 +53,19 @@ namespace YoutubeListSyncronizer
         private int Index;
         private int MaxResolution;
         private bool IsSelectedVideo;
+        private String VideoTitle;
 
         public static Status[] StatusArr;
 
-        public YTVideoDownloader(string downloadFolder, string downloadUrl, int index, int maxResolution, bool isSelected)
+        public YTVideoDownloader(string downloadFolder, string downloadUrl, String videoTitle, int index, int maxResolution, bool isSelected)
         {
             DownloadUrl = downloadUrl;
             DownloadFolder = downloadFolder;
             Index = index;
             MaxResolution = maxResolution;
             IsSelectedVideo = isSelected;
-            StatusArr[Index] = new Status { IsSelected = isSelected, Index = index};
+            VideoTitle = videoTitle;
+            StatusArr[Index] = new Status { IsSelected = isSelected, Index = index };
         }
 
         public void Start()
@@ -77,6 +79,13 @@ namespace YoutubeListSyncronizer
             }
             try
             {
+                if (CheckIfVideoExists())
+                {
+                    StatusArr[Index].IsAlreadyExists = true;
+                    StatusArr[Index].IsSuccessful = true;
+                    StatusArr[Index].Progress = 100;
+                    return;
+                }
                 var video = FindVideoInfo();
                 if (video == null)
                 {
@@ -87,18 +96,12 @@ namespace YoutubeListSyncronizer
                 if (video.RequiresDecryption)
                     DownloadUrlResolver.DecryptDownloadUrl(video);
 
-                //var fileName = "{0:D4} - {1}_{3}p{2}".FormatString(Index, RemoveIllegalPathCharacters(video.Title).Left(100), video.VideoExtension, video.Resolution);
-                //var fileName = "{0} - {1}_{3}p{2}".FormatString(video.VideoID, RemoveIllegalPathCharacters(video.Title).Left(100), video.VideoExtension, video.Resolution);
                 var fileName = "{1}_{3}p{2}".FormatString(video.VideoID, RemoveIllegalPathCharacters(video.Title).Left(100), video.VideoExtension, video.Resolution);
                 var downloadPath = Path.Combine(DownloadFolder, fileName);
-                if (!File.Exists(downloadPath))
-                {
-                    var videoDownloader = new VideoDownloader(video, downloadPath);
-                    videoDownloader.DownloadProgressChanged += (sender, args) => StatusArr[Index].Progress = Convert.ToInt32(args.ProgressPercentage);
-                    videoDownloader.Execute();
-                }
-                else
-                    StatusArr[Index].IsAlreadyExists = true;
+                var videoDownloader = new VideoDownloader(video, downloadPath);
+                videoDownloader.DownloadProgressChanged += (sender, args) => StatusArr[Index].Progress = Convert.ToInt32(args.ProgressPercentage);
+                videoDownloader.Execute();
+
                 StatusArr[Index].IsSuccessful = true;
                 StatusArr[Index].Progress = 100;
             }
@@ -108,6 +111,14 @@ namespace YoutubeListSyncronizer
                 StatusArr[Index].Exception = ex;
                 StatusArr[Index].Progress = 100;
             }
+        }
+
+        private bool CheckIfVideoExists()
+        {
+            var title = RemoveIllegalPathCharacters(VideoTitle).Left(200);
+            var files = Directory.GetFiles(DownloadFolder, title + "*");
+            var result = files.Any();
+            return result;
         }
 
         private VideoInfo FindVideoInfo()

@@ -94,12 +94,12 @@ namespace YoutubeListSyncronizer
             {
                 var item = items[i];
                 var videoID = item.SubItems[1].Text;
-                var videoURL = item.SubItems[2].Text;
+                var title = item.SubItems[2].Text;
                 var isSelected = item.Checked;
                 ParsedVideos[i] = new YTVideoDownloader.ParsedVideo
                                         {
                                             VideoID = videoID,
-                                            VideoURL = videoURL,
+                                            Title= title,
                                             IsSelected = isSelected
                                         };
             }
@@ -226,8 +226,9 @@ namespace YoutubeListSyncronizer
                 {
                     var video = args.ParsedVideos[i];
                     var url = "http://www.youtube.com/watch?v=" + video.VideoID;
+                    
                     var isSelected = video.IsSelected;
-                    var downloader = new YTVideoDownloader(args.VideoFolder, url, i, args.MaxRes, isSelected);
+                    var downloader = new YTVideoDownloader(args.VideoFolder, url, video.Title, i, args.MaxRes, isSelected);
                     downloader.Start();
                 }
             });
@@ -297,18 +298,17 @@ namespace YoutubeListSyncronizer
             listView.Update();
             progressBar.Value = Math.Min(100,
                 Convert.ToInt32(YTVideoDownloader.StatusArr.Where(s => s != null && s.IsSelected).Sum(s => s.Progress) / (countOfSelectedVideos * 1.0)));
-            if (Debugger.IsAttached)
-            {
-                Debug.WriteLine("****************************************************************************");
-                Debug.WriteLine("Total Progress: " + progressBar.Value);
-                for (int index = 0; index < YTVideoDownloader.StatusArr.Length; index++)
-                    if (YTVideoDownloader.StatusArr[index] != null && YTVideoDownloader.StatusArr[index].IsSelected)
-                        Debug.WriteLine(index + ": " + YTVideoDownloader.StatusArr[index]);
-                Debug.WriteLine("****************************************************************************");
-            }
+            this.Text = progressBar.Value.ToString() +"% - Syncronizing...";
+            Debug.WriteLine("****************************************************************************");
+            Debug.WriteLine("Total Progress: " + progressBar.Value);
+            for (int index = 0; index < YTVideoDownloader.StatusArr.Length; index++)
+                if (YTVideoDownloader.StatusArr[index] != null && YTVideoDownloader.StatusArr[index].IsSelected)
+                    Debug.WriteLine(index + ": " + YTVideoDownloader.StatusArr[index]);
+            Debug.WriteLine("****************************************************************************");
             if (lastCompletedDownloadIndex >= YTVideoDownloader.StatusArr.Length - 1)
             {
                 timerDownloader.Stop();
+                this.Text = "Syncronization Complete!";
                 MessageBox.Show("Completed Syncronization!", "Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 listView.BackColor = Color.White;
                 btnFetchPlaylist.Enabled = btnDownload.Enabled = btnCheckAll.Enabled = true;
