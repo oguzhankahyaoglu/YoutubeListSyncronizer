@@ -55,7 +55,7 @@
             // txtPlaylist
             // 
             this.txtPlaylist.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtPlaylist.Location = new System.Drawing.Point(165, 3);
+            this.txtPlaylist.Location = new System.Drawing.Point(164, 3);
             this.txtPlaylist.Multiline = true;
             this.txtPlaylist.Name = "txtPlaylist";
             this.txtPlaylist.Size = new System.Drawing.Size(480, 29);
@@ -65,9 +65,9 @@
             // btnFetchPlaylist
             // 
             this.btnFetchPlaylist.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnFetchPlaylist.Location = new System.Drawing.Point(651, 3);
+            this.btnFetchPlaylist.Location = new System.Drawing.Point(650, 3);
             this.btnFetchPlaylist.Name = "btnFetchPlaylist";
-            this.btnFetchPlaylist.Size = new System.Drawing.Size(189, 29);
+            this.btnFetchPlaylist.Size = new System.Drawing.Size(190, 29);
             this.btnFetchPlaylist.TabIndex = 1;
             this.btnFetchPlaylist.Text = "Fetch Videos ";
             this.btnFetchPlaylist.UseVisualStyleBackColor = true;
@@ -90,7 +90,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.label1.Location = new System.Drawing.Point(84, 5);
+            this.label1.Location = new System.Drawing.Point(83, 5);
             this.label1.Margin = new System.Windows.Forms.Padding(5);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(73, 25);
@@ -102,9 +102,9 @@
             // 
             this.btnDownload.Dock = System.Windows.Forms.DockStyle.Fill;
             this.btnDownload.Enabled = false;
-            this.btnDownload.Location = new System.Drawing.Point(651, 633);
+            this.btnDownload.Location = new System.Drawing.Point(650, 633);
             this.btnDownload.Name = "btnDownload";
-            this.btnDownload.Size = new System.Drawing.Size(189, 29);
+            this.btnDownload.Size = new System.Drawing.Size(190, 29);
             this.btnDownload.TabIndex = 4;
             this.btnDownload.Text = "Start Downloading";
             this.btnDownload.UseVisualStyleBackColor = true;
@@ -188,7 +188,7 @@
             this.tableLayoutPanel1.ColumnCount = 3;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 24.96195F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 75.03806F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 194F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 195F));
             this.tableLayoutPanel1.Controls.Add(this.label1, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.txtPlaylist, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.listView, 0, 1);
@@ -213,7 +213,7 @@
             this.flowLayoutPanel1.Controls.Add(this.label2);
             this.flowLayoutPanel1.Controls.Add(this.cbmMaxRes);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(165, 633);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(164, 633);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
             this.flowLayoutPanel1.Size = new System.Drawing.Size(480, 29);
             this.flowLayoutPanel1.TabIndex = 7;
@@ -223,7 +223,7 @@
             this.btnCheckAll.Dock = System.Windows.Forms.DockStyle.Fill;
             this.btnCheckAll.Location = new System.Drawing.Point(3, 633);
             this.btnCheckAll.Name = "btnCheckAll";
-            this.btnCheckAll.Size = new System.Drawing.Size(156, 29);
+            this.btnCheckAll.Size = new System.Drawing.Size(155, 29);
             this.btnCheckAll.TabIndex = 8;
             this.btnCheckAll.Text = "Check/Uncheck ALL";
             this.btnCheckAll.UseVisualStyleBackColor = true;
@@ -231,7 +231,7 @@
             // 
             // timerDownloader
             // 
-            this.timerDownloader.Interval = 1000;
+            this.timerDownloader.Interval = 3000;
             this.timerDownloader.Tick += new System.EventHandler(this.timerDownloader_Tick);
             // 
             // Form1

@@ -31,7 +31,7 @@ namespace YoutubeListSyncronizer
         {
             InitializeComponent();
             cbmMaxRes.Items.AddRange(MaxResolutions.Cast<object>().ToArray());
-            cbmMaxRes.SelectedIndex = 0;
+            cbmMaxRes.SelectedIndex = 1;
             folderBrowser.SelectedPath = Environment.GetFolderPath(Environment.SpecialFolder.MyVideos, Environment.SpecialFolderOption.DoNotVerify);
         }
 
@@ -64,6 +64,7 @@ namespace YoutubeListSyncronizer
                                                      }
                                                      progressBar.Hide();
                                                      UpdateSelectedVideosArray();
+                                                     ToggleCheckedVideos();
                                                  };
                 listWorker.RunWorkerAsync();
             }
@@ -198,7 +199,7 @@ namespace YoutubeListSyncronizer
             StartDownloading(videoFolder);
         }
 
-        private static readonly int[] MaxResolutions = new[] { 1080, 720, 480, 360 };
+        private static readonly int[] MaxResolutions = new[] { 2160, 1080, 720, 480, 360 };
 
         private void StartDownloading(string videoFolder)
         {
@@ -260,7 +261,7 @@ namespace YoutubeListSyncronizer
 
         #endregion
 
-        private void btnCheckAll_Click(object sender, EventArgs e)
+        private void ToggleCheckedVideos()
         {
             for (int i = 0; i < listView.Items.Count; i++)
             {
@@ -268,12 +269,18 @@ namespace YoutubeListSyncronizer
             }
         }
 
+        private void btnCheckAll_Click(object sender, EventArgs e)
+        {
+            ToggleCheckedVideos();
+        }
+
         private void timerDownloader_Tick(object sender, EventArgs e)
         {
             var countOfSelectedVideos = ParsedVideos.Count(v => v.IsSelected);
+            var countOfVideos = listView.Items.Count;
             var lastDownloaded = YTVideoDownloader.StatusArr.LastOrDefault(s => s != null && s.Progress == 100);
             var lastCompletedDownloadIndex = lastDownloaded == null ? -1 : lastDownloaded.Index;
-            for (int i = 0; i < listView.Items.Count; i++)
+            for (int i = 0; i < countOfVideos; i++)
             {
                 //Do not update already completed elements again and again
                 var status = YTVideoDownloader.StatusArr[i];
@@ -291,14 +298,16 @@ namespace YoutubeListSyncronizer
                             text = "Failed to find resolution: " + status.Exception.GetExceptionString();
                     }
                     else
+                    {
                         text = status.Progress.ToString() + "%";
+                        this.Text = "{0} / {1} : {2}% - Syncronizing...".FormatString(i+1, countOfVideos, status.Progress);
+                    }
                 }
                 listView.Items[i].SubItems[3].Text = text;
             }
             listView.Update();
             progressBar.Value = Math.Min(100,
                 Convert.ToInt32(YTVideoDownloader.StatusArr.Where(s => s != null && s.IsSelected).Sum(s => s.Progress) / (countOfSelectedVideos * 1.0)));
-            this.Text = progressBar.Value.ToString() +"% - Syncronizing...";
             Debug.WriteLine("****************************************************************************");
             Debug.WriteLine("Total Progress: " + progressBar.Value);
             for (int index = 0; index < YTVideoDownloader.StatusArr.Length; index++)
