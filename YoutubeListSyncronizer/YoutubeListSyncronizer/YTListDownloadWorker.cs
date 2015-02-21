@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using System.Xml.Linq;
 using Kahia.Common.Extensions.ConversionExtensions;
 using Kahia.Common.Extensions.StringExtensions;
@@ -46,7 +48,13 @@ namespace YoutubeListSyncronizer
 
         private int ParsePlaylistXml(string xmlStr, out int pageSize)
         {
-            var xDoc = XDocument.Parse(xmlStr, LoadOptions.PreserveWhitespace);
+            //var xDoc = XDocument.Parse(xmlStr, LoadOptions.PreserveWhitespace);
+            XDocument xDoc;
+            using (var xmlStream = new StringReader(xmlStr))
+            using (var xmlReader = new XmlTextReader(xmlStream))
+            {
+                xDoc = XDocument.Load(xmlReader, LoadOptions.PreserveWhitespace);
+            }
             var rootElem = xDoc.Elements().First();
             var entries = rootElem.Elements(XName.Get("entry", "http://www.w3.org/2005/Atom"));
             foreach (var entry in entries)
@@ -71,6 +79,7 @@ namespace YoutubeListSyncronizer
             string xmlStr;
             using (var client = new WebClientExtended())
             {
+                client.Encoding = Encoding.UTF8;
                 xmlStr = client.DownloadString(urlFormat.FormatString(PlaylistID, startIndex));
             }
             return xmlStr;

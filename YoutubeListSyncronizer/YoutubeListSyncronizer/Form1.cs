@@ -184,7 +184,11 @@ namespace YoutubeListSyncronizer
                 MessageBox.Show("No videos selected to download. Select at least one video to download!", "No Video Selected!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            folderBrowser.ShowDialog();
+            if (folderBrowser.ShowDialog() != DialogResult.OK)
+            {
+                MessageBox.Show("No directory selected. Please select a directory to download into.", "No directory selected!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
             var videoFolder = folderBrowser.SelectedPath;
             if (videoFolder.IsNullOrEmptyString())
                 return;
