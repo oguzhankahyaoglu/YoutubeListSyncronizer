@@ -48,8 +48,11 @@
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.btnCheckAll = new System.Windows.Forms.Button();
             this.timerDownloader = new System.Windows.Forms.Timer(this.components);
+            this.flowShutdown = new System.Windows.Forms.FlowLayoutPanel();
+            this.cbShutdown = new System.Windows.Forms.CheckBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
+            this.flowShutdown.SuspendLayout();
             this.SuspendLayout();
             // 
             // txtPlaylist
@@ -58,16 +61,16 @@
             this.txtPlaylist.Location = new System.Drawing.Point(164, 3);
             this.txtPlaylist.Multiline = true;
             this.txtPlaylist.Name = "txtPlaylist";
-            this.txtPlaylist.Size = new System.Drawing.Size(480, 29);
+            this.txtPlaylist.Size = new System.Drawing.Size(479, 29);
             this.txtPlaylist.TabIndex = 0;
             this.txtPlaylist.Text = "https://www.youtube.com/playlist?list=FL0O6m-jrVllHCo94bJ-a9bA";
             // 
             // btnFetchPlaylist
             // 
             this.btnFetchPlaylist.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnFetchPlaylist.Location = new System.Drawing.Point(650, 3);
+            this.btnFetchPlaylist.Location = new System.Drawing.Point(649, 3);
             this.btnFetchPlaylist.Name = "btnFetchPlaylist";
-            this.btnFetchPlaylist.Size = new System.Drawing.Size(190, 29);
+            this.btnFetchPlaylist.Size = new System.Drawing.Size(191, 29);
             this.btnFetchPlaylist.TabIndex = 1;
             this.btnFetchPlaylist.Text = "Fetch Videos ";
             this.btnFetchPlaylist.UseVisualStyleBackColor = true;
@@ -102,9 +105,9 @@
             // 
             this.btnDownload.Dock = System.Windows.Forms.DockStyle.Fill;
             this.btnDownload.Enabled = false;
-            this.btnDownload.Location = new System.Drawing.Point(650, 633);
+            this.btnDownload.Location = new System.Drawing.Point(649, 633);
             this.btnDownload.Name = "btnDownload";
-            this.btnDownload.Size = new System.Drawing.Size(190, 29);
+            this.btnDownload.Size = new System.Drawing.Size(191, 29);
             this.btnDownload.TabIndex = 4;
             this.btnDownload.Text = "Start Downloading";
             this.btnDownload.UseVisualStyleBackColor = true;
@@ -122,10 +125,10 @@
             this.listView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.listView.FullRowSelect = true;
             this.listView.GridLines = true;
-            this.listView.Location = new System.Drawing.Point(3, 38);
+            this.listView.Location = new System.Drawing.Point(3, 73);
             this.listView.MultiSelect = false;
             this.listView.Name = "listView";
-            this.listView.Size = new System.Drawing.Size(837, 589);
+            this.listView.Size = new System.Drawing.Size(837, 554);
             this.listView.TabIndex = 5;
             this.listView.UseCompatibleStateImageBehavior = false;
             this.listView.View = System.Windows.Forms.View.Details;
@@ -187,22 +190,24 @@
             // 
             this.tableLayoutPanel1.ColumnCount = 3;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 24.96195F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 75.03806F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 195F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 75.03805F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 196F));
             this.tableLayoutPanel1.Controls.Add(this.label1, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.txtPlaylist, 1, 0);
-            this.tableLayoutPanel1.Controls.Add(this.listView, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.listView, 0, 2);
             this.tableLayoutPanel1.Controls.Add(this.btnFetchPlaylist, 2, 0);
-            this.tableLayoutPanel1.Controls.Add(this.progressBar, 0, 3);
-            this.tableLayoutPanel1.Controls.Add(this.btnDownload, 2, 2);
-            this.tableLayoutPanel1.Controls.Add(this.flowLayoutPanel1, 1, 2);
-            this.tableLayoutPanel1.Controls.Add(this.btnCheckAll, 0, 2);
+            this.tableLayoutPanel1.Controls.Add(this.progressBar, 0, 4);
+            this.tableLayoutPanel1.Controls.Add(this.btnDownload, 2, 3);
+            this.tableLayoutPanel1.Controls.Add(this.flowLayoutPanel1, 1, 3);
+            this.tableLayoutPanel1.Controls.Add(this.btnCheckAll, 0, 3);
+            this.tableLayoutPanel1.Controls.Add(this.flowShutdown, 1, 1);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 4;
+            this.tableLayoutPanel1.RowCount = 5;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 5F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 85F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 5F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 80F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 5F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 5F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(843, 700);
@@ -215,7 +220,7 @@
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel1.Location = new System.Drawing.Point(164, 633);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(480, 29);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(479, 29);
             this.flowLayoutPanel1.TabIndex = 7;
             // 
             // btnCheckAll
@@ -234,6 +239,25 @@
             this.timerDownloader.Interval = 3000;
             this.timerDownloader.Tick += new System.EventHandler(this.timerDownloader_Tick);
             // 
+            // flowShutdown
+            // 
+            this.flowShutdown.Controls.Add(this.cbShutdown);
+            this.flowShutdown.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flowShutdown.Location = new System.Drawing.Point(164, 38);
+            this.flowShutdown.Name = "flowShutdown";
+            this.flowShutdown.Size = new System.Drawing.Size(479, 29);
+            this.flowShutdown.TabIndex = 9;
+            // 
+            // cbShutdown
+            // 
+            this.cbShutdown.AutoSize = true;
+            this.cbShutdown.Location = new System.Drawing.Point(3, 3);
+            this.cbShutdown.Name = "cbShutdown";
+            this.cbShutdown.Size = new System.Drawing.Size(144, 17);
+            this.cbShutdown.TabIndex = 0;
+            this.cbShutdown.Text = "Shutdown on complete? ";
+            this.cbShutdown.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -250,6 +274,8 @@
             this.tableLayoutPanel1.PerformLayout();
             this.flowLayoutPanel1.ResumeLayout(false);
             this.flowLayoutPanel1.PerformLayout();
+            this.flowShutdown.ResumeLayout(false);
+            this.flowShutdown.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -275,6 +301,8 @@
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
         private System.Windows.Forms.Button btnCheckAll;
         private System.Windows.Forms.Timer timerDownloader;
+        private System.Windows.Forms.FlowLayoutPanel flowShutdown;
+        private System.Windows.Forms.CheckBox cbShutdown;
     }
 }
 

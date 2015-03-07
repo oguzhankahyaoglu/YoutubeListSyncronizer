@@ -100,7 +100,7 @@ namespace YoutubeListSyncronizer
                 ParsedVideos[i] = new YTVideoDownloader.ParsedVideo
                                         {
                                             VideoID = videoID,
-                                            Title= title,
+                                            Title = title,
                                             IsSelected = isSelected
                                         };
             }
@@ -198,7 +198,7 @@ namespace YoutubeListSyncronizer
                 return;
             }
             listView.BackColor = Color.LightGray;
-            btnDownload.Enabled = btnFetchPlaylist.Enabled = btnCheckAll.Enabled = false;
+            btnDownload.Enabled = btnFetchPlaylist.Enabled = btnCheckAll.Enabled = flowShutdown.Enabled = false;
             IsListViewReadOnly = true;
             StartDownloading(videoFolder);
         }
@@ -231,7 +231,7 @@ namespace YoutubeListSyncronizer
                 {
                     var video = args.ParsedVideos[i];
                     var url = "http://www.youtube.com/watch?v=" + video.VideoID;
-                    
+
                     var isSelected = video.IsSelected;
                     var downloader = new YTVideoDownloader(args.VideoFolder, url, video.Title, i, args.MaxRes, isSelected);
                     downloader.Start();
@@ -304,7 +304,7 @@ namespace YoutubeListSyncronizer
                     else
                     {
                         text = status.Progress.ToString() + "%";
-                        this.Text = "{0} / {1} : {2}% - Syncronizing...".FormatString(i+1, countOfVideos, status.Progress);
+                        this.Text = "{0} / {1} : {2}% - Syncronizing...".FormatString(i + 1, countOfVideos, status.Progress);
                     }
                 }
                 listView.Items[i].SubItems[3].Text = text;
@@ -326,12 +326,19 @@ namespace YoutubeListSyncronizer
                 listView.BackColor = Color.White;
                 btnFetchPlaylist.Enabled = btnDownload.Enabled = btnCheckAll.Enabled = true;
                 IsListViewReadOnly = false;
+                if (cbShutdown.Checked)
+                    ShutdownComputer();
             }
             else
             {
                 //var downloadActiveIndex = YTVideoDownloader.StatusArr.Last(s => s != null && s.Progress < 100).Index;
                 listView.Items[Math.Min(lastCompletedDownloadIndex + 2, listView.Items.Count - 1)].EnsureVisible();
             }
+        }
+
+        private void ShutdownComputer()
+        {
+            Process.Start("shutdown", "/s /f /t 0");
         }
 
         private bool IsListViewReadOnly = false;
