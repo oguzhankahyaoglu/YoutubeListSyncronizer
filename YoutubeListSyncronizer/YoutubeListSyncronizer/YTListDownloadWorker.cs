@@ -19,6 +19,8 @@ namespace YoutubeListSyncronizer
         public int TotalVideoCount { get; private set; }
 
         private String PlaylistID;
+        public String PlaylistName { get; private set; }
+
         public YTListDownloadWorker(String playlistID)
         {
             WorkerSupportsCancellation = true;
@@ -56,7 +58,7 @@ namespace YoutubeListSyncronizer
                 xDoc = XDocument.Load(xmlReader, LoadOptions.PreserveWhitespace);
             }
             var rootElem = xDoc.Elements().First();
-            var entries = rootElem.Elements(XName.Get("entry", "http://www.w3.org/2005/Atom"));
+            var entries = rootElem.Elements(XName.Get("entry", "http://www.w3.org/2005/Atom")).ToArray();
             foreach (var entry in entries)
             {
                 var mediaGroupElem = entry.Element(XName.Get("group", "http://search.yahoo.com/mrss/"));
@@ -70,6 +72,9 @@ namespace YoutubeListSyncronizer
             }
             var totalVideoCount = rootElem.Element(XName.Get("totalResults", "http://a9.com/-/spec/opensearch/1.1/")).Value.ToNullableInt(0);
             pageSize = entries.Count();
+            var playlistNameElem = rootElem.Element(XName.Get("title", "http://www.w3.org/2005/Atom"));
+            if (playlistNameElem != null)
+                PlaylistName = playlistNameElem.Value;
             return totalVideoCount;
         }
 

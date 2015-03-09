@@ -36,26 +36,27 @@ namespace YoutubeListSyncronizer
         }
 
         private YTVideoDownloader.ParsedVideo[] ParsedVideos;
+        private YTListDownloadWorker ytlistDownloadWorker;
         private void btnFetchPlaylist_Click(object sender, EventArgs e)
         {
             btnFetchPlaylist.Enabled = false;
             var playlistId = ParsePlaylistId(txtPlaylist.Text);
             if (playlistId != null)
             {
-                var listWorker = new YTListDownloadWorker(playlistId);
+                ytlistDownloadWorker = new YTListDownloadWorker(playlistId);
                 progressBar.Show();
-                listWorker.ProgressChanged += (o, args) =>
+                ytlistDownloadWorker.ProgressChanged += (o, args) =>
                                                   {
                                                       progressBar.Value = Math.Min(100, args.ProgressPercentage);
                                                   };
-                listWorker.RunWorkerCompleted += (o, args) =>
+                ytlistDownloadWorker.RunWorkerCompleted += (o, args) =>
                                                  {
-                                                     MessageBox.Show("Total videos in this list:" + listWorker.TotalVideoCount);
+                                                     MessageBox.Show("Total videos in this list:" + ytlistDownloadWorker.TotalVideoCount);
                                                      btnDownload.Enabled = true;
                                                      listView.Items.Clear();
                                                      var index = 1;
 
-                                                     var orderedDic = listWorker.VideoIDsDictionary.Reverse();
+                                                     var orderedDic = ytlistDownloadWorker.VideoIDsDictionary.Reverse();
                                                      foreach (var kvp in orderedDic)
                                                      {
                                                          var item = new ListViewItem(new[] { index.ToString("D4"), kvp.Key, kvp.Value, "" });
@@ -66,7 +67,7 @@ namespace YoutubeListSyncronizer
                                                      UpdateSelectedVideosArray();
                                                      ToggleCheckedVideos();
                                                  };
-                listWorker.RunWorkerAsync();
+                ytlistDownloadWorker.RunWorkerAsync();
             }
             else
             {
@@ -200,7 +201,7 @@ namespace YoutubeListSyncronizer
             listView.BackColor = Color.LightGray;
             btnDownload.Enabled = btnFetchPlaylist.Enabled = btnCheckAll.Enabled = flowShutdown.Enabled = false;
             IsListViewReadOnly = true;
-            StartDownloading(videoFolder);
+            StartDownloading(Path.Combine(videoFolder, ytlistDownloadWorker.PlaylistName));
         }
 
         private static readonly int[] MaxResolutions = new[] { 2160, 1080, 720, 480, 360 };
