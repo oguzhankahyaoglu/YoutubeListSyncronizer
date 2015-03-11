@@ -61,16 +61,17 @@
             this.txtPlaylist.Location = new System.Drawing.Point(164, 3);
             this.txtPlaylist.Multiline = true;
             this.txtPlaylist.Name = "txtPlaylist";
-            this.txtPlaylist.Size = new System.Drawing.Size(478, 29);
+            this.txtPlaylist.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtPlaylist.Size = new System.Drawing.Size(477, 29);
             this.txtPlaylist.TabIndex = 0;
             this.txtPlaylist.Text = "https://www.youtube.com/playlist?list=PLDZMiVQ0iUnCwGbMckmoupzrmTNRIo-Y0";
             // 
             // btnFetchPlaylist
             // 
             this.btnFetchPlaylist.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnFetchPlaylist.Location = new System.Drawing.Point(648, 3);
+            this.btnFetchPlaylist.Location = new System.Drawing.Point(647, 3);
             this.btnFetchPlaylist.Name = "btnFetchPlaylist";
-            this.btnFetchPlaylist.Size = new System.Drawing.Size(192, 29);
+            this.btnFetchPlaylist.Size = new System.Drawing.Size(193, 29);
             this.btnFetchPlaylist.TabIndex = 1;
             this.btnFetchPlaylist.Text = "Fetch Videos ";
             this.btnFetchPlaylist.UseVisualStyleBackColor = true;
@@ -105,9 +106,9 @@
             // 
             this.btnDownload.Dock = System.Windows.Forms.DockStyle.Fill;
             this.btnDownload.Enabled = false;
-            this.btnDownload.Location = new System.Drawing.Point(648, 633);
+            this.btnDownload.Location = new System.Drawing.Point(647, 633);
             this.btnDownload.Name = "btnDownload";
-            this.btnDownload.Size = new System.Drawing.Size(192, 29);
+            this.btnDownload.Size = new System.Drawing.Size(193, 29);
             this.btnDownload.TabIndex = 4;
             this.btnDownload.Text = "Start Downloading";
             this.btnDownload.UseVisualStyleBackColor = true;
@@ -191,7 +192,7 @@
             this.tableLayoutPanel1.ColumnCount = 3;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 24.96195F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 75.03805F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 197F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 198F));
             this.tableLayoutPanel1.Controls.Add(this.label1, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.txtPlaylist, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.listView, 0, 2);
@@ -220,7 +221,7 @@
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel1.Location = new System.Drawing.Point(164, 633);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(478, 29);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(477, 29);
             this.flowLayoutPanel1.TabIndex = 7;
             // 
             // btnCheckAll
@@ -240,7 +241,7 @@
             this.flowShutdown.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowShutdown.Location = new System.Drawing.Point(164, 38);
             this.flowShutdown.Name = "flowShutdown";
-            this.flowShutdown.Size = new System.Drawing.Size(478, 29);
+            this.flowShutdown.Size = new System.Drawing.Size(477, 29);
             this.flowShutdown.TabIndex = 9;
             // 
             // cbShutdown
@@ -260,6 +261,7 @@
             // 
             // Form1
             // 
+            this.AcceptButton = this.btnFetchPlaylist;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(843, 700);

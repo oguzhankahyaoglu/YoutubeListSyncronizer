@@ -39,6 +39,8 @@ namespace YoutubeListSyncronizer
         private YTListDownloadWorker ytlistDownloadWorker;
         private void btnFetchPlaylist_Click(object sender, EventArgs e)
         {
+            listView.Items.Clear();
+            this.AcceptButton = btnDownload;
             btnFetchPlaylist.Enabled = false;
             var playlistId = ParsePlaylistId(txtPlaylist.Text);
             if (playlistId != null)
@@ -84,6 +86,7 @@ namespace YoutubeListSyncronizer
                 progressBar.Hide();
                 UpdateSelectedVideosArray();
                 MessageBox.Show("The url is a youtube video link, instead of a playlist. Single video will be downloaded.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ToggleCheckedVideos();
             }
         }
 
@@ -201,7 +204,12 @@ namespace YoutubeListSyncronizer
             listView.BackColor = Color.LightGray;
             btnDownload.Enabled = btnFetchPlaylist.Enabled = btnCheckAll.Enabled = flowShutdown.Enabled = false;
             IsListViewReadOnly = true;
-            StartDownloading(Path.Combine(videoFolder, ytlistDownloadWorker.PlaylistName));
+            //if downloading a playlist, ytlistDownloadWorker will not be null and use subfolder
+            if (ytlistDownloadWorker != null)
+                StartDownloading(Path.Combine(videoFolder, ytlistDownloadWorker.PlaylistName));
+            else
+                StartDownloading(videoFolder);
+            this.AcceptButton = btnFetchPlaylist;
         }
 
         private static readonly int[] MaxResolutions = new[] { 2160, 1080, 720, 480, 360 };
