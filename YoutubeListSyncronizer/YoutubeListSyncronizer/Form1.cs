@@ -33,6 +33,15 @@ namespace YoutubeListSyncronizer
             cbmMaxRes.Items.AddRange(MaxResolutions.Cast<object>().ToArray());
             cbmMaxRes.SelectedIndex = 1;
             folderBrowser.SelectedPath = Environment.GetFolderPath(Environment.SpecialFolder.MyVideos, Environment.SpecialFolderOption.DoNotVerify);
+            {
+                var text = Clipboard.GetText();
+                String normalizedUrl;
+                if (!String.IsNullOrEmpty(text) && DownloadUrlResolver.TryNormalizeYoutubeUrl(text, out normalizedUrl))
+                {
+                    txtPlaylist.Text = text;
+                    btnFetchPlaylist_Click(null,null);
+                }
+            }
         }
 
         private YTVideoDownloader.ParsedVideo[] ParsedVideos;
@@ -87,6 +96,7 @@ namespace YoutubeListSyncronizer
                 UpdateSelectedVideosArray();
                 MessageBox.Show("The url is a youtube video link, instead of a playlist. Single video will be downloaded.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 ToggleCheckedVideos();
+                btnDownload_Click(null,null);
             }
         }
 
