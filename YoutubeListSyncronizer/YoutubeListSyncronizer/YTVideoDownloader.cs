@@ -110,6 +110,7 @@ namespace YoutubeListSyncronizer
                 StatusArr[Index].IsSuccessful = false;
                 StatusArr[Index].Exception = ex;
                 StatusArr[Index].Progress = 100;
+                Logger.Log(ex);
             }
         }
 
