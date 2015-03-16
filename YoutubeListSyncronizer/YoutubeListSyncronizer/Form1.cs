@@ -21,37 +21,58 @@ using System.Xml.XPath;
 using Kahia.Common.Extensions.ConversionExtensions;
 using Kahia.Common.Extensions.GeneralExtensions;
 using Kahia.Common.Extensions.StringExtensions;
+using Microsoft.VisualBasic;
 using YoutubeListSyncronizer.Library;
 
 namespace YoutubeListSyncronizer
 {
     public partial class Form1 : Form
     {
+        private String PlaylistUrl;
+        private YTVideoDownloader.ParsedVideo[] ParsedVideos;
+        private YTListDownloadWorker ytlistDownloadWorker;
+
         public Form1()
         {
             InitializeComponent();
             cbmMaxRes.Items.AddRange(MaxResolutions.Cast<object>().ToArray());
             cbmMaxRes.SelectedIndex = 1;
             folderBrowser.SelectedPath = Environment.GetFolderPath(Environment.SpecialFolder.MyVideos, Environment.SpecialFolderOption.DoNotVerify);
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+            //try to get url from clipboard first
+            var url = Clipboard.GetText();
+            String normalizedUrl;
+            if (!String.IsNullOrEmpty(url) && DownloadUrlResolver.TryNormalizeYoutubeUrl(url, out normalizedUrl))
             {
-                var text = Clipboard.GetText();
-                String normalizedUrl;
-                if (!String.IsNullOrEmpty(text) && DownloadUrlResolver.TryNormalizeYoutubeUrl(text, out normalizedUrl))
+                PlaylistUrl = url;
+                btnFetchPlaylist_Click(null, null);
+            }
+            else
+            {
+                url = Interaction.InputBox("Youtube video/playlist link:", "Link", "https://www.youtube.com/playlist?list=PLDZMiVQ0iUnCwGbMckmoupzrmTNRIo-Y0");
+                if (!String.IsNullOrEmpty(url) && DownloadUrlResolver.TryNormalizeYoutubePlaylistUrl(url, out normalizedUrl))
                 {
-                    txtPlaylist.Text = text;
-                    btnFetchPlaylist_Click(null,null);
+                    PlaylistUrl = url;
+                    btnFetchPlaylist_Click(null, null);
+                }
+                else
+                {
+                    MessageBox.Show("Invalid url.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Application.ExitThread();
                 }
             }
         }
 
-        private YTVideoDownloader.ParsedVideo[] ParsedVideos;
-        private YTListDownloadWorker ytlistDownloadWorker;
         private void btnFetchPlaylist_Click(object sender, EventArgs e)
         {
             listView.Items.Clear();
             this.AcceptButton = btnDownload;
-            btnFetchPlaylist.Enabled = false;
-            var playlistId = ParsePlaylistId(txtPlaylist.Text);
+            //btnFetchPlaylist.Enabled = false;
+            var playlistId = ParsePlaylistId();
             if (playlistId != null)
             {
                 ytlistDownloadWorker = new YTListDownloadWorker(playlistId);
@@ -82,21 +103,21 @@ namespace YoutubeListSyncronizer
             }
             else
             {
-                var youtubeVideoID = ParseVideoID(txtPlaylist.Text);
+                var youtubeVideoID = ParseVideoID();
                 if (youtubeVideoID == null)
                 {
                     MessageBox.Show("'{0}' is neither a Youtube Playlist nor a Youtube Video Link! Try links in other formats or report if you think this is a bug.", "Url Wrong Format", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
-                var item = new ListViewItem(new[] { 1.ToString("D4"), youtubeVideoID, txtPlaylist.Text, "" });
+                var item = new ListViewItem(new[] { 1.ToString("D4"), youtubeVideoID, PlaylistUrl, "" });
                 listView.Items.Add(item);
                 btnDownload.Enabled = true;
-                btnFetchPlaylist.Enabled = true;
+                //btnFetchPlaylist.Enabled = true;
                 progressBar.Hide();
                 UpdateSelectedVideosArray();
                 MessageBox.Show("The url is a youtube video link, instead of a playlist. Single video will be downloaded.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 ToggleCheckedVideos();
-                btnDownload_Click(null,null);
+                btnDownload_Click(null, null);
             }
         }
 
@@ -143,10 +164,10 @@ namespace YoutubeListSyncronizer
             return writeAllow && !writeDeny;
         }
 
-        private string ParseVideoID(string url)
+        private string ParseVideoID()
         {
             String normalizedUrl;
-            if (DownloadUrlResolver.TryNormalizeYoutubeUrl(url, out normalizedUrl))
+            if (DownloadUrlResolver.TryNormalizeYoutubeUrl(PlaylistUrl, out normalizedUrl))
             {
                 var qscoll = ParseQueryString(normalizedUrl);
                 var ytid = qscoll["v"];
@@ -182,9 +203,9 @@ namespace YoutubeListSyncronizer
             return nvc;
         }
 
-        private string ParsePlaylistId(string link)
+        private string ParsePlaylistId()
         {
-            var qscoll = ParseQueryString(link);
+            var qscoll = ParseQueryString(PlaylistUrl);
             return qscoll["list"];
         }
 
@@ -212,14 +233,14 @@ namespace YoutubeListSyncronizer
                 return;
             }
             listView.BackColor = Color.LightGray;
-            btnDownload.Enabled = btnFetchPlaylist.Enabled = btnCheckAll.Enabled = flowShutdown.Enabled = false;
+            //btnDownload.Enabled = btnFetchPlaylist.Enabled = btnCheckAll.Enabled = flowShutdown.Enabled = false;
+            btnDownload.Enabled = btnCheckAll.Enabled = false;
             IsListViewReadOnly = true;
             //if downloading a playlist, ytlistDownloadWorker will not be null and use subfolder
             if (ytlistDownloadWorker != null)
                 StartDownloading(Path.Combine(videoFolder, ytlistDownloadWorker.PlaylistName));
             else
                 StartDownloading(videoFolder);
-            this.AcceptButton = btnFetchPlaylist;
         }
 
         private static readonly int[] MaxResolutions = new[] { 2160, 1080, 720, 480, 360 };
@@ -343,21 +364,15 @@ namespace YoutubeListSyncronizer
                 this.Text = "Syncronization Complete!";
                 MessageBox.Show("Completed Syncronization!", "Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 listView.BackColor = Color.White;
-                btnFetchPlaylist.Enabled = btnDownload.Enabled = btnCheckAll.Enabled = true;
+                //btnFetchPlaylist.Enabled = btnDownload.Enabled = btnCheckAll.Enabled = true;
+                btnDownload.Enabled = btnCheckAll.Enabled = true;
                 IsListViewReadOnly = false;
-                if (cbShutdown.Checked)
-                    ShutdownComputer();
+                Application.Exit();
             }
             else
             {
-                //var downloadActiveIndex = YTVideoDownloader.StatusArr.Last(s => s != null && s.Progress < 100).Index;
                 listView.Items[Math.Min(lastCompletedDownloadIndex + 2, listView.Items.Count - 1)].EnsureVisible();
             }
-        }
-
-        private void ShutdownComputer()
-        {
-            Process.Start("shutdown", "/s /f /t 0");
         }
 
         private bool IsListViewReadOnly = false;
@@ -381,7 +396,7 @@ namespace YoutubeListSyncronizer
 
         private void listView_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
-            e.Item.BackColor = e.Item.Checked ? Color.Wheat : Color.White;
+            e.Item.BackColor = e.Item.Checked ? Color.GreenYellow : Color.White;
         }
 
 
