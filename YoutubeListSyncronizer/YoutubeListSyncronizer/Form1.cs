@@ -46,24 +46,22 @@ namespace YoutubeListSyncronizer
             //try to get url from clipboard first
             var url = Clipboard.GetText();
             String normalizedUrl;
+            var defaultUrl = "https://www.youtube.com/playlist?list=PLDZMiVQ0iUnCwGbMckmoupzrmTNRIo-Y0";
             if (!String.IsNullOrEmpty(url) && DownloadUrlResolver.TryNormalizeYoutubeUrl(url, out normalizedUrl))
+            {
+                defaultUrl = normalizedUrl;
+            }
+            
+            url = Interaction.InputBox("Youtube video/playlist link:", "Link", defaultUrl);
+            if (!String.IsNullOrEmpty(url) && DownloadUrlResolver.TryNormalizeYoutubePlaylistUrl(url, out normalizedUrl))
             {
                 PlaylistUrl = url;
                 btnFetchPlaylist_Click(null, null);
             }
             else
             {
-                url = Interaction.InputBox("Youtube video/playlist link:", "Link", "https://www.youtube.com/playlist?list=PLDZMiVQ0iUnCwGbMckmoupzrmTNRIo-Y0");
-                if (!String.IsNullOrEmpty(url) && DownloadUrlResolver.TryNormalizeYoutubePlaylistUrl(url, out normalizedUrl))
-                {
-                    PlaylistUrl = url;
-                    btnFetchPlaylist_Click(null, null);
-                }
-                else
-                {
-                    MessageBox.Show("Invalid url.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    Application.ExitThread();
-                }
+                MessageBox.Show("Invalid url.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Application.ExitThread();
             }
         }
 
