@@ -21,6 +21,7 @@ namespace YoutubeListSyncronizer
             {
                 { "app", "YoutubeListSyncronizer" },
                 { "key", "20562056" },
+                { "title", ex.Message },
                 { "log", exStr },
             };
             using (var wc = new WebClient())
