@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -11,16 +12,23 @@ namespace YoutubeListSyncronizer
 {
     public static class Logger
     {
-        private const String URI = "http://www.myurl.com/post.php";
+        private const String URI = "http://log.okahyaoglu.net/?";
+        //private const String URI = "http://localhost/LogMaster/?";
         public static void Log(Exception ex)
         {
             var exStr = ConvertExceptionToString(ex);
-            var parameters = "app=YoutubeListSyncronizer&key=20562056&log="+ exStr;
+            var values = new NameValueCollection
+            {
+                { "app", "YoutubeListSyncronizer" },
+                { "key", "20562056" },
+                { "log", exStr },
+            };
             using (var wc = new WebClient())
             {
                 wc.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
-                var result = wc.UploadString(URI, parameters);
-                Debug.WriteLine("[Logger Result] " + result);
+                var result = wc.UploadValues(URI, values);
+                var resultStr = Encoding.UTF8.GetString(result);
+                Debug.WriteLine("[Logger Result] " + resultStr);
             }
         }
 
