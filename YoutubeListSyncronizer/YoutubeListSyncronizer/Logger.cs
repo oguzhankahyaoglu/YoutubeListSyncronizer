@@ -24,12 +24,21 @@ namespace YoutubeListSyncronizer
                 { "title", ex.Message },
                 { "log", exStr },
             };
-            using (var wc = new WebClient())
+
+            try
             {
-                wc.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
-                var result = wc.UploadValues(URI, values);
-                var resultStr = Encoding.UTF8.GetString(result);
-                Debug.WriteLine("[Logger Result] " + resultStr);
+                using (var wc = new WebClient())
+                {
+                    wc.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
+                    var result = wc.UploadValues(URI, values);
+                    var resultStr = Encoding.UTF8.GetString(result);
+                    Debug.WriteLine("[Logger Result] " + resultStr);
+                }
+            }
+            catch (Exception)
+            {
+                if (Debugger.IsAttached)
+                    throw;
             }
         }
 
