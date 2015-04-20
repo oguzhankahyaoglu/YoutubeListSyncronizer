@@ -51,7 +51,7 @@ namespace YoutubeListSyncronizer
             {
                 defaultUrl = normalizedUrl;
             }
-            
+
             url = Interaction.InputBox("Youtube video/playlist link:", "Link", defaultUrl);
             if (!String.IsNullOrEmpty(url) && DownloadUrlResolver.TryNormalizeYoutubePlaylistUrl(url, out normalizedUrl))
             {
@@ -225,9 +225,12 @@ namespace YoutubeListSyncronizer
             var videoFolder = folderBrowser.SelectedPath;
             if (videoFolder.IsNullOrEmptyString())
                 return;
-            if (!HasWritePermissionOnDir(videoFolder))
+            var fullVideoFolder = ytlistDownloadWorker != null ? Path.Combine(videoFolder, ytlistDownloadWorker.PlaylistName) : videoFolder;
+            if (!Directory.Exists(fullVideoFolder))
+                Directory.CreateDirectory(fullVideoFolder);
+            if (!HasWritePermissionOnDir(fullVideoFolder))
             {
-                MessageBox.Show("The path '{0}' could not be accessedç Try to run this application as administrator, or select another path.".FormatString(videoFolder), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("The path '{0}' could not be accessedç Try to run this application as administrator, or select another path.".FormatString(fullVideoFolder), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             listView.BackColor = Color.LightGray;
@@ -235,10 +238,7 @@ namespace YoutubeListSyncronizer
             btnDownload.Enabled = btnCheckAll.Enabled = false;
             IsListViewReadOnly = true;
             //if downloading a playlist, ytlistDownloadWorker will not be null and use subfolder
-            if (ytlistDownloadWorker != null)
-                StartDownloading(Path.Combine(videoFolder, ytlistDownloadWorker.PlaylistName));
-            else
-                StartDownloading(videoFolder);
+            StartDownloading(fullVideoFolder);
         }
 
         private static readonly int[] MaxResolutions = new[] { 2160, 1080, 720, 480, 360 };
