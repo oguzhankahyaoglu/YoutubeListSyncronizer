@@ -32,18 +32,25 @@ namespace YoutubeListSyncronizer
 
         protected override void OnDoWork(DoWorkEventArgs e)
         {
-            var startIndex = 1;
-            var pageSize = 0;
-            while (TotalVideoCount > VideoIDsDictionary.Count)
+            try
             {
-                var xmlStr = DownloadPlaylistXml(startIndex);
-                TotalVideoCount = ParsePlaylistXml(xmlStr, out pageSize);
-                if (pageSize == 0)
-                    break;
-                startIndex += pageSize;
-                ReportProgress(Convert.ToInt32((startIndex * 100.0 / TotalVideoCount)));
+                var startIndex = 1;
+                var pageSize = 0;
+                while (TotalVideoCount > VideoIDsDictionary.Count)
+                {
+                    var xmlStr = DownloadPlaylistXml(startIndex);
+                    TotalVideoCount = ParsePlaylistXml(xmlStr, out pageSize);
+                    if (pageSize == 0)
+                        break;
+                    startIndex += pageSize;
+                    ReportProgress(Convert.ToInt32((startIndex * 100.0 / TotalVideoCount)));
+                }
+                ReportProgress(100);
             }
-            ReportProgress(100);
+            catch (Exception ex)
+            {
+                throw new Exception("YT listesi çekilirken hata oluştu.", ex);
+            }
         }
 
         #region Helpers

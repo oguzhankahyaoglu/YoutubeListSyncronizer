@@ -81,6 +81,13 @@ namespace YoutubeListSyncronizer
                                                   };
                 ytlistDownloadWorker.RunWorkerCompleted += (o, args) =>
                                                  {
+                                                     if (args.Error != null)
+                                                     {
+                                                         MessageBox.Show(args.Error.ConvertExceptionToString());
+                                                         Logger.Log(args.Error);
+                                                         Application.Exit();
+                                                         return;
+                                                     }
                                                      MessageBox.Show("Total videos in this list:" + ytlistDownloadWorker.TotalVideoCount);
                                                      btnDownload.Enabled = true;
                                                      listView.Items.Clear();
