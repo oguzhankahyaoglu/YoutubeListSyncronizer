@@ -84,6 +84,7 @@ namespace YoutubeListSyncronizer
                                                      if (args.Error != null)
                                                      {
                                                          MessageBox.Show(args.Error.ConvertExceptionToString());
+                                                         Visible = false;
                                                          Logger.Log(args.Error);
                                                          Application.Exit();
                                                          return;
