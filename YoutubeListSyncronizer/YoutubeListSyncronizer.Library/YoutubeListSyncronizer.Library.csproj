@@ -103,6 +103,7 @@
     <Compile Include="Mp3AudioExtractor.cs" />
     <Compile Include="ProgressEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VideoDeletedException.cs" />
     <Compile Include="VideoDownloader.cs" />
     <Compile Include="VideoInfo.cs" />
     <Compile Include="VideoNotAvailableException.cs" />
