@@ -233,20 +233,21 @@ namespace YoutubeListSyncronizer
             var videoFolder = folderBrowser.SelectedPath;
             if (videoFolder.IsNullOrEmptyString())
                 return;
-            var fullVideoFolder = ytlistDownloadWorker != null ? Path.Combine(videoFolder, ytlistDownloadWorker.PlaylistName) : videoFolder;
-            if (!Directory.Exists(fullVideoFolder))
-                Directory.CreateDirectory(fullVideoFolder);
-            if (!HasWritePermissionOnDir(fullVideoFolder))
+            if (!Directory.Exists(videoFolder))
+                Directory.CreateDirectory(videoFolder);
+            if (!HasWritePermissionOnDir(videoFolder))
             {
-                MessageBox.Show("The path '{0}' could not be accessedç Try to run this application as administrator, or select another path.".FormatString(fullVideoFolder), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("The path '{0}' could not be accessedç Try to run this application as administrator, or select another path.".FormatString(videoFolder), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+            if (MessageBox.Show("Downloading to {0}, are you sure?".FormatString(videoFolder), "Confirm", MessageBoxButtons.OKCancel) != DialogResult.OK)
+                return;
             listView.BackColor = Color.LightGray;
             //btnDownload.Enabled = btnFetchPlaylist.Enabled = btnCheckAll.Enabled = flowShutdown.Enabled = false;
             btnDownload.Enabled = btnCheckAll.Enabled = false;
             IsListViewReadOnly = true;
             //if downloading a playlist, ytlistDownloadWorker will not be null and use subfolder
-            StartDownloading(fullVideoFolder);
+            StartDownloading(videoFolder);
         }
 
         private static readonly int[] MaxResolutions = new[] { 2160, 1080, 720, 480, 360 };

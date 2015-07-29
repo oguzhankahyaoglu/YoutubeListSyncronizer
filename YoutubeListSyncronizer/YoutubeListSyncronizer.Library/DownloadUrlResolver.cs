@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
+using Google.Apis.YouTube.v3.Data;
 using Newtonsoft.Json.Linq;
 
 namespace YoutubeListSyncronizer.Library
@@ -340,6 +341,9 @@ namespace YoutubeListSyncronizer.Library
             {
                 throw new VideoNotAvailableException();
             }
+
+            if (pageSource.Contains("Deleted Video"))
+                throw new VideoDeletedException(url);
 
             var dataRegex = new Regex(@"ytplayer\.config\s*=\s*(\{.+?\});", RegexOptions.Multiline);
 

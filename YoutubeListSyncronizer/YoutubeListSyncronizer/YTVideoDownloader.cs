@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -33,6 +34,7 @@ namespace YoutubeListSyncronizer
             public bool IsSelected { get; set; }
             public bool IsAlreadyExists { get; set; }
             public Exception Exception { get; set; }
+            public String ExceptionMessage { get; set; }
             public override string ToString()
             {
                 return "Progress: {0}, IsSelected: {4}, IsSuccess: {1}, IsAlreadyExist: {2}, Ex: {3}".FormatString(Progress, IsSuccessful, IsAlreadyExists, Exception.GetExceptionString(), IsSelected);
@@ -104,6 +106,15 @@ namespace YoutubeListSyncronizer
 
                 StatusArr[Index].IsSuccessful = true;
                 StatusArr[Index].Progress = 100;
+            }
+            catch (WebException ex)
+            {
+                //403 aldıysa, daha friendly bir mesaj yollamalıyım!
+                StatusArr[Index].IsSuccessful = false;
+                StatusArr[Index].Exception = ex;
+                StatusArr[Index].ExceptionMessage = "Youtube is temporarily unavailable. Try again later.";
+                StatusArr[Index].Progress = 100;
+                Logger.Log(ex);
             }
             catch (Exception ex)
             {

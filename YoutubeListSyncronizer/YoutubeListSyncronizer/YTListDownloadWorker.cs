@@ -5,9 +5,14 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Services;
+using Google.Apis.Util.Store;
+using Google.Apis.YouTube.v3;
 using Kahia.Common.Extensions.ConversionExtensions;
 using Kahia.Common.Extensions.StringExtensions;
 
@@ -19,7 +24,6 @@ namespace YoutubeListSyncronizer
         public int TotalVideoCount { get; private set; }
 
         private String PlaylistID;
-        public String PlaylistName { get; private set; }
 
         public YTListDownloadWorker(String playlistID)
         {
@@ -34,17 +38,8 @@ namespace YoutubeListSyncronizer
         {
             try
             {
-                var startIndex = 1;
-                var pageSize = 0;
-                while (TotalVideoCount > VideoIDsDictionary.Count)
-                {
-                    var xmlStr = DownloadPlaylistXml(startIndex);
-                    TotalVideoCount = ParsePlaylistXml(xmlStr, out pageSize);
-                    if (pageSize == 0)
-                        break;
-                    startIndex += pageSize;
-                    ReportProgress(Convert.ToInt32((startIndex * 100.0 / TotalVideoCount)));
-                }
+                DownloadPlaylistItems(PlaylistID);
+                TotalVideoCount = VideoIDsDictionary.Count;
                 ReportProgress(100);
             }
             catch (Exception ex)
@@ -53,50 +48,29 @@ namespace YoutubeListSyncronizer
             }
         }
 
-        #region Helpers
-
-        private int ParsePlaylistXml(string xmlStr, out int pageSize)
+        private void DownloadPlaylistItems(string playlistId)
         {
-            //var xDoc = XDocument.Parse(xmlStr, LoadOptions.PreserveWhitespace);
-            XDocument xDoc;
-            using (var xmlStream = new StringReader(xmlStr))
-            using (var xmlReader = new XmlTextReader(xmlStream))
+            var youtubeService = new YouTubeService(new BaseClientService.Initializer
             {
-                xDoc = XDocument.Load(xmlReader, LoadOptions.PreserveWhitespace);
-            }
-            var rootElem = xDoc.Elements().First();
-            var entries = rootElem.Elements(XName.Get("entry", "http://www.w3.org/2005/Atom")).ToArray();
-            foreach (var entry in entries)
-            {
-                var mediaGroupElem = entry.Element(XName.Get("group", "http://search.yahoo.com/mrss/"));
-                var videoIdElem = mediaGroupElem.Element(XName.Get("videoid", "http://gdata.youtube.com/schemas/2007"));
-                var videoId = videoIdElem.Value;
+                ApplicationName = "YoutubeListSyncronizer",
+                ApiKey = "AIzaSyDgUR4esr5twkPl5jRwGlx6yPGR8e6zBPs"
+            });
 
-                var mediaTitleElem = mediaGroupElem.Element(XName.Get("title", "http://search.yahoo.com/mrss/"));
-                var title = mediaTitleElem.Value;
-                if (!VideoIDsDictionary.ContainsKey(videoId))
-                    VideoIDsDictionary.Add(videoId, title);
+            var nextPageToken = "";
+            while (nextPageToken != null)
+            {
+                var request = youtubeService.PlaylistItems.List("snippet");
+                request.PlaylistId = playlistId;
+                request.MaxResults = 20;
+                request.PageToken = nextPageToken;
+
+                var response = request.Execute();
+
+                foreach (var playlistItem in response.Items)
+                    VideoIDsDictionary.Add(playlistItem.Snippet.ResourceId.VideoId, playlistItem.Snippet.Title);
+
+                nextPageToken = response.NextPageToken;
             }
-            var totalVideoCount = rootElem.Element(XName.Get("totalResults", "http://a9.com/-/spec/opensearch/1.1/")).Value.ToNullableInt(0);
-            pageSize = entries.Count();
-            var playlistNameElem = rootElem.Element(XName.Get("title", "http://www.w3.org/2005/Atom"));
-            if (playlistNameElem != null)
-                PlaylistName = playlistNameElem.Value;
-            return totalVideoCount;
         }
-
-        private string DownloadPlaylistXml(int startIndex)
-        {
-            const string urlFormat = @"https://gdata.youtube.com/feeds/api/playlists/{0}?v=2&max-results=20&start-index={1}";
-            string xmlStr;
-            using (var client = new WebClientExtended())
-            {
-                client.Encoding = Encoding.UTF8;
-                xmlStr = client.DownloadString(urlFormat.FormatString(PlaylistID, startIndex));
-            }
-            return xmlStr;
-        }
-
-        #endregion
     }
 }
