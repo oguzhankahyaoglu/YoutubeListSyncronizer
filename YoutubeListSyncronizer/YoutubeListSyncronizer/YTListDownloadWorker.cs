@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -21,6 +22,7 @@ namespace YoutubeListSyncronizer
     public class YTListDownloadWorker : BackgroundWorker
     {
         public Dictionary<string, string> VideoIDsDictionary { get; private set; }
+        public String PlaylistName { get; private set; }
         public int TotalVideoCount { get; private set; }
 
         private String PlaylistID;
@@ -55,6 +57,24 @@ namespace YoutubeListSyncronizer
                 ApplicationName = "YoutubeListSyncronizer",
                 ApiKey = "AIzaSyDgUR4esr5twkPl5jRwGlx6yPGR8e6zBPs"
             });
+
+            //fetch playlist name
+            {
+                var request = youtubeService.Playlists.List("snippet");
+                request.Id = PlaylistID;
+                var response = request.Execute();
+                try
+                {
+                    PlaylistName = response.Items[0].Snippet.Title;
+                }
+                catch (Exception ex)
+                {
+                    if (Debugger.IsAttached)
+                        throw;
+                    PlaylistName = "Youtube";
+                }
+            }
+            ReportProgress(30);
 
             var nextPageToken = "";
             while (nextPageToken != null)

@@ -30,6 +30,8 @@ namespace YoutubeListSyncronizer
         {
             public int Progress;
             public int Index;
+            public ParsedVideo ParsedVideo;
+            public VideoInfo VideoInfo;
             public bool IsSuccessful { get; set; }
             public bool IsSelected { get; set; }
             public bool IsAlreadyExists { get; set; }
@@ -95,6 +97,7 @@ namespace YoutubeListSyncronizer
                     StatusArr[Index].Progress = 100;
                     return;
                 }
+                StatusArr[Index].VideoInfo = video;
                 if (video.RequiresDecryption)
                     DownloadUrlResolver.DecryptDownloadUrl(video);
 
@@ -107,18 +110,14 @@ namespace YoutubeListSyncronizer
                 StatusArr[Index].IsSuccessful = true;
                 StatusArr[Index].Progress = 100;
             }
-            catch (WebException ex)
-            {
-                //403 aldıysa, daha friendly bir mesaj yollamalıyım!
-                StatusArr[Index].IsSuccessful = false;
-                StatusArr[Index].Exception = ex;
-                StatusArr[Index].ExceptionMessage = "Youtube is temporarily unavailable. Try again later.";
-                StatusArr[Index].Progress = 100;
-                Logger.Log(ex);
-            }
             catch (Exception ex)
             {
                 StatusArr[Index].IsSuccessful = false;
+                if (ex is WebException)
+                    StatusArr[Index].ExceptionMessage = "Video cannot be reached at the moment.";
+                else
+                if (ex is VideoNotAvailableException)
+                    StatusArr[Index].ExceptionMessage = ex.Message;
                 StatusArr[Index].Exception = ex;
                 StatusArr[Index].Progress = 100;
                 Logger.Log(ex);

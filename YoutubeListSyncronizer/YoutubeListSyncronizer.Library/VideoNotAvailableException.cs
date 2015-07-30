@@ -14,5 +14,9 @@ namespace YoutubeListSyncronizer.Library
         public VideoNotAvailableException(string message)
             : base(message)
         { }
+
+        public VideoNotAvailableException(string message, Exception inner)
+            : base(message, inner)
+        { }
     }
 }

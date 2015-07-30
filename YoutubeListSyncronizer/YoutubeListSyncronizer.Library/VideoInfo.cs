@@ -123,6 +123,11 @@ namespace YoutubeListSyncronizer.Library
         public AudioType AudioType { get; private set; }
 
         /// <summary>
+        /// YT Apiden'dene PageSource
+        /// </summary>
+        public String VideoPageSource { get; set; }
+
+        /// <summary>
         /// Gets a value indicating whether the audio of this video can be extracted by YoutubeExtractor.
         /// </summary>
         /// <value>

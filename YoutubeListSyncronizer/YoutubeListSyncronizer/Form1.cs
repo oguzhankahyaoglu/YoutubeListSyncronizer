@@ -233,6 +233,7 @@ namespace YoutubeListSyncronizer
             var videoFolder = folderBrowser.SelectedPath;
             if (videoFolder.IsNullOrEmptyString())
                 return;
+            videoFolder = Path.Combine(videoFolder, ytlistDownloadWorker.PlaylistName);
             if (!Directory.Exists(videoFolder))
                 Directory.CreateDirectory(videoFolder);
             if (!HasWritePermissionOnDir(videoFolder))
@@ -283,6 +284,7 @@ namespace YoutubeListSyncronizer
                     var downloader = new YTVideoDownloader(args.VideoFolder, url, video.Title, i, args.MaxRes, isSelected);
                     downloader.Start();
                 }
+                var end = 1;
             });
             YTDownloadThread.Start(x);
             timerDownloader.Start();
@@ -346,7 +348,11 @@ namespace YoutubeListSyncronizer
                         if (status.IsSuccessful)
                             text = status.IsAlreadyExists ? "Already exists." : "Completed!";
                         else
-                            text = "Failed to find resolution: " + status.Exception.GetExceptionString();
+                        {
+                            text = Debugger.IsAttached
+                                ? status.Exception.GetExceptionString()
+                                : status.ExceptionMessage.ToStringByDefaultValue("Failed to find resolution: " + status.Exception.GetExceptionString());
+                        }
                     }
                     else
                     {
@@ -372,9 +378,6 @@ namespace YoutubeListSyncronizer
                 MessageBox.Show("Completed Syncronization!", "Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 listView.BackColor = Color.White;
                 //btnFetchPlaylist.Enabled = btnDownload.Enabled = btnCheckAll.Enabled = true;
-                btnDownload.Enabled = btnCheckAll.Enabled = true;
-                IsListViewReadOnly = false;
-                Application.Exit();
             }
             else
             {

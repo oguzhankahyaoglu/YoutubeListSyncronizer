@@ -35,6 +35,10 @@ namespace YoutubeListSyncronizer
                     Debug.WriteLine("[Logger Result] " + resultStr);
                 }
             }
+            catch (WebException)
+            {
+                //loglayamazsa hatayı
+            }
             catch (Exception)
             {
                 if (Debugger.IsAttached)

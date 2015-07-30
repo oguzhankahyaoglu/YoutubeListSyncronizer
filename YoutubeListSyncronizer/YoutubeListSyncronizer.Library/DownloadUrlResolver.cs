@@ -88,13 +88,14 @@ namespace YoutubeListSyncronizer.Library
 
             try
             {
-                var json = LoadJson(videoUrl);
+                String videoPageSource;
+                var json = LoadJson(videoUrl, out videoPageSource);
                 videoID = json["args"]["video_id"].ToString();
                 string videoTitle = GetVideoTitle(json);
 
                 IEnumerable<ExtractionInfo> downloadUrls = ExtractDownloadUrls(json);
 
-                IEnumerable<VideoInfo> infos = GetVideoInfos(downloadUrls, videoTitle).ToList();
+                IEnumerable<VideoInfo> infos = GetVideoInfos(downloadUrls, videoTitle, videoPageSource).ToList();
 
                 string htmlPlayerVersion = GetHtml5PlayerVersion(json);
 
@@ -283,17 +284,17 @@ namespace YoutubeListSyncronizer.Library
             return streamMapString;
         }
 
-        private static IEnumerable<VideoInfo> GetVideoInfos(IEnumerable<ExtractionInfo> extractionInfos, string videoTitle)
+        private static IEnumerable<VideoInfo> GetVideoInfos(IEnumerable<ExtractionInfo> extractionInfos, string videoTitle, string videoPageSource)
         {
             var downLoadInfos = new List<VideoInfo>();
 
             foreach (ExtractionInfo extractionInfo in extractionInfos)
             {
-                string itag = HttpHelper.ParseQueryString(extractionInfo.Uri.Query)["itag"];
+                var itag = HttpHelper.ParseQueryString(extractionInfo.Uri.Query)["itag"];
 
-                int formatCode = int.Parse(itag);
+                var formatCode = int.Parse(itag);
 
-                VideoInfo info = VideoInfo.Defaults.SingleOrDefault(videoInfo => videoInfo.FormatCode == formatCode);
+                var info = VideoInfo.Defaults.SingleOrDefault(videoInfo => videoInfo.FormatCode == formatCode);
 
                 if (info != null)
                 {
@@ -301,6 +302,7 @@ namespace YoutubeListSyncronizer.Library
                     {
                         DownloadUrl = extractionInfo.Uri.ToString(),
                         Title = videoTitle,
+                        VideoPageSource = videoPageSource,
                         RequiresDecryption = extractionInfo.RequiresDecryption
                     };
                 }
@@ -309,7 +311,8 @@ namespace YoutubeListSyncronizer.Library
                 {
                     info = new VideoInfo(formatCode)
                     {
-                        DownloadUrl = extractionInfo.Uri.ToString()
+                        DownloadUrl = extractionInfo.Uri.ToString(),
+                        VideoPageSource = videoPageSource,
                     };
                 }
 
@@ -333,9 +336,9 @@ namespace YoutubeListSyncronizer.Library
             return pageSource.Contains(unavailableContainer);
         }
 
-        private static JObject LoadJson(string url)
+        private static JObject LoadJson(string url, out string pageSource)
         {
-            string pageSource = HttpHelper.DownloadString(url);
+            pageSource = HttpHelper.DownloadString(url);
 
             if (IsVideoUnavailable(pageSource))
             {
@@ -345,9 +348,20 @@ namespace YoutubeListSyncronizer.Library
             if (pageSource.Contains("Deleted Video"))
                 throw new VideoDeletedException(url);
 
-            var dataRegex = new Regex(@"ytplayer\.config\s*=\s*(\{.+?\});", RegexOptions.Multiline);
-
-            string extractedJson = dataRegex.Match(pageSource).Result("$1");
+            string extractedJson;
+            try
+            {
+                var dataRegex = new Regex(@"ytplayer\.config\s*=\s*(\{.+?\});", RegexOptions.Multiline);
+                var match = dataRegex.Match(pageSource);
+                if (match.Length > 0)
+                    extractedJson = match.Result("$1");
+                else
+                    throw new VideoNotAvailableException("Video not found. (No match)");
+            }
+            catch (NotSupportedException ex)
+            {
+                throw new VideoNotAvailableException("Video not found. (Invalid)", ex);
+            }
 
             return JObject.Parse(extractedJson);
         }

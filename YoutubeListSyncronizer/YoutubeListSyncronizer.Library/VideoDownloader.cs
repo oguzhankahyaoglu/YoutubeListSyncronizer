@@ -41,33 +41,40 @@ namespace YoutubeListSyncronizer.Library
                 request.AddRange(0, this.BytesToDownload.Value - 1);
             }
 
-            // the following code is alternative, you may implement the function after your needs
-            using (WebResponse response = request.GetResponse())
+            try
             {
-                using (Stream source = response.GetResponseStream())
+                // the following code is alternative, you may implement the function after your needs
+                using (WebResponse response = request.GetResponse())
                 {
-                    using (FileStream target = File.Open(this.SavePath, FileMode.Create, FileAccess.Write))
+                    using (Stream source = response.GetResponseStream())
                     {
-                        var buffer = new byte[1024];
-                        bool cancel = false;
-                        int bytes;
-                        int copiedBytes = 0;
-                        while (!cancel && (bytes = source.Read(buffer, 0, buffer.Length)) > 0)
+                        using (FileStream target = File.Open(this.SavePath, FileMode.Create, FileAccess.Write))
                         {
-                            target.Write(buffer, 0, bytes);
-                            copiedBytes += bytes;
-                            var eventArgs = new ProgressEventArgs((copiedBytes * 1.0 / response.ContentLength) * 100);
-                            if (this.DownloadProgressChanged != null)
+                            var buffer = new byte[1024];
+                            bool cancel = false;
+                            int bytes;
+                            int copiedBytes = 0;
+                            while (!cancel && (bytes = source.Read(buffer, 0, buffer.Length)) > 0)
                             {
-                                this.DownloadProgressChanged(this, eventArgs);
-                                if (eventArgs.Cancel)
+                                target.Write(buffer, 0, bytes);
+                                copiedBytes += bytes;
+                                var eventArgs = new ProgressEventArgs((copiedBytes * 1.0 / response.ContentLength) * 100);
+                                if (this.DownloadProgressChanged != null)
                                 {
-                                    cancel = true;
+                                    this.DownloadProgressChanged(this, eventArgs);
+                                    if (eventArgs.Cancel)
+                                    {
+                                        cancel = true;
+                                    }
                                 }
                             }
                         }
                     }
                 }
+            }
+            catch (WebException)
+            {
+                throw;
             }
             this.OnDownloadFinished(EventArgs.Empty);
         }
