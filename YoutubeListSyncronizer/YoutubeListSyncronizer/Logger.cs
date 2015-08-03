@@ -12,7 +12,7 @@ namespace YoutubeListSyncronizer
 {
     public static class Logger
     {
-        private const String URI = "http://log.okahyaoglu.net/?";
+        private const String URI = "http://okahyaoglu.net/logmaster/?";
         //private const String URI = "http://localhost/LogMaster/?";
         public static void Log(Exception ex)
         {
