@@ -29,6 +29,7 @@ namespace YoutubeListSyncronizer
     public partial class Form1 : Form
     {
         private String PlaylistUrl;
+        private String VideoUrl;
         private YTVideoDownloader.ParsedVideo[] ParsedVideos;
         private YTListDownloadWorker ytlistDownloadWorker;
 
@@ -49,19 +50,22 @@ namespace YoutubeListSyncronizer
             var defaultUrl = "https://www.youtube.com/playlist?list=PLDZMiVQ0iUnCwGbMckmoupzrmTNRIo-Y0";
             if (!String.IsNullOrEmpty(url) && DownloadUrlResolver.TryNormalizeYoutubeUrl(url, out normalizedUrl))
             {
-                defaultUrl = normalizedUrl;
-            }
-
-            url = Interaction.InputBox("Youtube video/playlist link:", "Link", defaultUrl);
-            if (!String.IsNullOrEmpty(url) && DownloadUrlResolver.TryNormalizeYoutubePlaylistUrl(url, out normalizedUrl))
-            {
-                PlaylistUrl = url;
+                VideoUrl = normalizedUrl;
                 btnFetchPlaylist_Click(null, null);
             }
             else
             {
-                MessageBox.Show("Invalid url.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Application.ExitThread();
+                url = Interaction.InputBox("Youtube video/playlist link:", "Link", defaultUrl);
+                if (!String.IsNullOrEmpty(url) && DownloadUrlResolver.TryNormalizeYoutubePlaylistUrl(url, out normalizedUrl))
+                {
+                    PlaylistUrl = url;
+                    btnFetchPlaylist_Click(null, null);
+                }
+                else
+                {
+                    MessageBox.Show("Invalid url.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Application.ExitThread();
+                }
             }
         }
 
@@ -173,9 +177,9 @@ namespace YoutubeListSyncronizer
         private string ParseVideoID()
         {
             String normalizedUrl;
-            if (DownloadUrlResolver.TryNormalizeYoutubeUrl(PlaylistUrl, out normalizedUrl))
+            if (VideoUrl.IsNotNullAndEmptyString())
             {
-                var qscoll = ParseQueryString(normalizedUrl);
+                var qscoll = ParseQueryString(VideoUrl);
                 var ytid = qscoll["v"];
                 return ytid;
             }
@@ -211,6 +215,8 @@ namespace YoutubeListSyncronizer
 
         private string ParsePlaylistId()
         {
+            if (PlaylistUrl.IsNullOrEmptyString())
+                return null;
             var qscoll = ParseQueryString(PlaylistUrl);
             return qscoll["list"];
         }
@@ -233,7 +239,8 @@ namespace YoutubeListSyncronizer
             var videoFolder = folderBrowser.SelectedPath;
             if (videoFolder.IsNullOrEmptyString())
                 return;
-            videoFolder = Path.Combine(videoFolder, ytlistDownloadWorker.PlaylistName);
+            if (ytlistDownloadWorker != null)
+                videoFolder = Path.Combine(videoFolder, ytlistDownloadWorker.PlaylistName);
             if (!Directory.Exists(videoFolder))
                 Directory.CreateDirectory(videoFolder);
             if (!HasWritePermissionOnDir(videoFolder))
@@ -281,7 +288,7 @@ namespace YoutubeListSyncronizer
                     var url = "http://www.youtube.com/watch?v=" + video.VideoID;
 
                     var isSelected = video.IsSelected;
-                    var downloader = new YTVideoDownloader(args.VideoFolder, url, video.Title, i, args.MaxRes, isSelected);
+                    var downloader = new YTVideoDownloader(args.VideoFolder, url, video.Title.ToStringByDefaultValue(video.VideoID), i, args.MaxRes, isSelected);
                     downloader.Start();
                 }
                 var end = 1;
