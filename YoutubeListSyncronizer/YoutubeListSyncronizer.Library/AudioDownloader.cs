@@ -22,6 +22,7 @@
 using System;
 using System.IO;
 using System.Net;
+using YoutubeListSyncronizer.Library.Exceptions;
 
 namespace YoutubeListSyncronizer.Library
 {

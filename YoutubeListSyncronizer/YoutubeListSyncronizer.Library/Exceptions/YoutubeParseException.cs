@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace YoutubeListSyncronizer.Library
+namespace YoutubeListSyncronizer.Library.Exceptions
 {
     /// <summary>
     /// <para>

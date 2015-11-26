@@ -5,6 +5,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using Google.Apis.YouTube.v3.Data;
 using Newtonsoft.Json.Linq;
+using YoutubeListSyncronizer.Library.Exceptions;
 
 namespace YoutubeListSyncronizer.Library
 {
@@ -83,7 +84,7 @@ namespace YoutubeListSyncronizer.Library
 
             if (!isYoutubeUrl)
             {
-                throw new ArgumentException("URL is not a valid youtube URL!");
+                throw new InvalidUrlException();
             }
 
             try

@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Kahia.Common.Extensions.GeneralExtensions;
 using Kahia.Common.Extensions.StringExtensions;
 using YoutubeListSyncronizer.Library;
+using YoutubeListSyncronizer.Library.Exceptions;
 
 namespace YoutubeListSyncronizer
 {
@@ -114,9 +115,10 @@ namespace YoutubeListSyncronizer
             {
                 StatusArr[Index].IsSuccessful = false;
                 if (ex is WebException)
-                    StatusArr[Index].ExceptionMessage = "Video cannot be reached at the moment: Error:" + ex.ConvertExceptionToString();
-                else
-                if (ex is VideoNotAvailableException)
+                    StatusArr[Index].ExceptionMessage = Resources.General.ExVideoCannotBeReached + ex.ConvertExceptionToString();
+                else if (ex is InvalidUrlException)
+                    StatusArr[Index].ExceptionMessage = Resources.General.ExInvalidUrl;
+                else if (ex is VideoNotAvailableException)
                     StatusArr[Index].ExceptionMessage = ex.Message;
                 StatusArr[Index].Exception = ex;
                 StatusArr[Index].Progress = 100;

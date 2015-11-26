@@ -21,7 +21,7 @@
 
 using System;
 
-namespace YoutubeListSyncronizer.Library
+namespace YoutubeListSyncronizer.Library.Exceptions
 {
     /// <summary>
     /// The exception that is thrown when an error occurs durin audio extraction.

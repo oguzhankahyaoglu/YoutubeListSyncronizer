@@ -23,6 +23,7 @@ using Kahia.Common.Extensions.GeneralExtensions;
 using Kahia.Common.Extensions.StringExtensions;
 using Microsoft.VisualBasic;
 using YoutubeListSyncronizer.Library;
+using YoutubeListSyncronizer.Library.Exceptions;
 
 namespace YoutubeListSyncronizer
 {
@@ -49,7 +50,7 @@ namespace YoutubeListSyncronizer
                 //try to get url from clipboard first
                 var clipboardUrl = Clipboard.GetText().ToStringByDefaultValue();
                 var defaultUrl = "https://www.youtube.com/playlist?list=PLDZMiVQ0iUnCwGbMckmoupzrmTNRIo-Y0";
-                if (clipboardUrl.Contains("youtube") || clipboardUrl.Contains("tube"))
+                if ((clipboardUrl.Contains("youtube") || clipboardUrl.Contains("tube")) && (clipboardUrl.Contains("http:") || clipboardUrl.Contains("https:")))
                     url = clipboardUrl;
                 else
                     url = Interaction.InputBox("Youtube video/playlist link:", "Link", defaultUrl);
@@ -67,7 +68,7 @@ namespace YoutubeListSyncronizer
             }
             else
             {
-                MessageBox.Show("Invalid url.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(Resources.General.WarningInvalidUrl, Resources.General.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Application.ExitThread();
             }
         }
@@ -96,7 +97,7 @@ namespace YoutubeListSyncronizer
                                                          Application.Exit();
                                                          return;
                                                      }
-                                                     MessageBox.Show("Total videos in this list:" + ytlistDownloadWorker.TotalVideoCount);
+                                                     MessageBox.Show(Resources.General.TotalVideosInThisList + ytlistDownloadWorker.TotalVideoCount);
                                                      btnDownload.Enabled = true;
                                                      listView.Items.Clear();
                                                      var index = 1;
@@ -119,7 +120,7 @@ namespace YoutubeListSyncronizer
                 var youtubeVideoID = ParseVideoID();
                 if (youtubeVideoID == null)
                 {
-                    MessageBox.Show("'{0}' is neither a Youtube Playlist nor a Youtube Video Link! Try links in other formats or report if you think this is a bug.", "Url Wrong Format", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(Resources.General.NotValidUrl, Resources.General.NotValidUrlTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
                 var item = new ListViewItem(new[] { 1.ToString("D4"), youtubeVideoID, PlaylistUrl, "" });
@@ -128,7 +129,7 @@ namespace YoutubeListSyncronizer
                 //btnFetchPlaylist.Enabled = true;
                 progressBar.Hide();
                 UpdateSelectedVideosArray();
-                MessageBox.Show("The url is a youtube video link, instead of a playlist. Single video will be downloaded.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(Resources.General.WarningThisUrlIsAVideoLinkInsteadOfAPlaylist, Resources.General.Warning, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 ToggleCheckedVideos();
                 btnDownload_Click(null, null);
             }
@@ -231,12 +232,12 @@ namespace YoutubeListSyncronizer
             UpdateSelectedVideosArray();
             if (ParsedVideos.Count(v => v.IsSelected) <= 0)
             {
-                MessageBox.Show("No videos selected to download. Select at least one video to download!", "No Video Selected!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(Resources.General.WarningNoVideosSelectedToDownload, Resources.General.WarningNoVideoSelected, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             if (folderBrowser.ShowDialog() != DialogResult.OK)
             {
-                MessageBox.Show("No directory selected. Please select a directory to download into.", "No directory selected!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(Resources.General.WarningNoDirectorySelected, Resources.General.WarningNoVideoSelected, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
             var videoFolder = folderBrowser.SelectedPath;
@@ -248,10 +249,10 @@ namespace YoutubeListSyncronizer
                 Directory.CreateDirectory(videoFolder);
             if (!HasWritePermissionOnDir(videoFolder))
             {
-                MessageBox.Show("The path '{0}' could not be accessedç Try to run this application as administrator, or select another path.".FormatString(videoFolder), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(Resources.General.WarningAccessDenied.FormatString(videoFolder), Resources.General.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            if (MessageBox.Show("Downloading to {0}, are you sure?".FormatString(videoFolder), "Confirm", MessageBoxButtons.OKCancel) != DialogResult.OK)
+            if (MessageBox.Show(Resources.General.ConfirmAreYouSure.FormatString(videoFolder), Resources.General.Confirm, MessageBoxButtons.OKCancel) != DialogResult.OK)
                 return;
             listView.BackColor = Color.LightGray;
             //btnDownload.Enabled = btnFetchPlaylist.Enabled = btnCheckAll.Enabled = flowShutdown.Enabled = false;
@@ -356,7 +357,7 @@ namespace YoutubeListSyncronizer
                     if (status.Progress == 100)
                     {
                         if (status.IsSuccessful)
-                            text = status.IsAlreadyExists ? "Already exists." : "Completed!";
+                            text = status.IsAlreadyExists ? Resources.General.StatusAlreadyExists : Resources.General.StatusCompleted;
                         else
                         {
                             if (Debugger.IsAttached)
@@ -364,16 +365,16 @@ namespace YoutubeListSyncronizer
                             else
                             {
                                 if (status.Exception is YoutubeBannedException)
-                                    text = status.ExceptionMessage.ToStringByDefaultValue("Youtube has banned your IP. Try again later.");
+                                    text = status.ExceptionMessage.ToStringByDefaultValue(Resources.General.ExMessageBannedIP);
                                 else
-                                    text = status.ExceptionMessage.ToStringByDefaultValue("Failed to find resolution: " + status.Exception.GetExceptionString());
+                                    text = status.ExceptionMessage.ToStringByDefaultValue(Resources.General.ExMessage + status.Exception.GetExceptionString());
                             }
                         }
                     }
                     else
                     {
-                        text = status.Progress.ToString() + "%";
-                        this.Text = "{0} / {1} : {2}% - Syncronizing...".FormatString(i + 1, countOfVideos, status.Progress);
+                        text = status.Progress + "%";
+                        this.Text = Resources.General.StatusSyncronizing.FormatString(i + 1, countOfVideos, status.Progress);
                     }
                 }
                 listView.Items[i].SubItems[3].Text = text;
@@ -390,8 +391,8 @@ namespace YoutubeListSyncronizer
             if (lastCompletedDownloadIndex >= YTVideoDownloader.StatusArr.Length - 1)
             {
                 timerDownloader.Stop();
-                this.Text = "Syncronization Complete!";
-                MessageBox.Show("Completed Syncronization!", "Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                this.Text = Resources.General.SyncComplete;
+                MessageBox.Show(Resources.General.SyncComplete, Resources.General.SyncComplete, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 listView.BackColor = Color.White;
                 //btnFetchPlaylist.Enabled = btnDownload.Enabled = btnCheckAll.Enabled = true;
             }

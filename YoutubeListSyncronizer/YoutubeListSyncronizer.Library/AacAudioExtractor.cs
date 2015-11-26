@@ -20,6 +20,7 @@
 // ****************************************************************************
 
 using System.IO;
+using YoutubeListSyncronizer.Library.Exceptions;
 
 namespace YoutubeListSyncronizer.Library
 {

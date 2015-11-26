@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace YoutubeListSyncronizer.Library
+namespace YoutubeListSyncronizer.Library.Exceptions
 {
     /// <summary>
     /// The exception that is thrown when the video is not available for viewing.
