@@ -44,7 +44,7 @@ namespace YoutubeListSyncronizer
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-            String url;
+            String url = "";
             {
                 //try to get url from clipboard first
                 var clipboardUrl = Clipboard.GetText().ToStringByDefaultValue();
@@ -55,12 +55,12 @@ namespace YoutubeListSyncronizer
                     url = Interaction.InputBox("Youtube video/playlist link:", "Link", defaultUrl);
             }
 
-            if (DownloadUrlResolver.TryNormalizeYoutubeUrl(url, out url))
+            if (DownloadUrlResolver.TryNormalizeYoutubeUrl(url, ref url))
             {
                 VideoUrl = url;
                 btnFetchPlaylist_Click(null, null);
             }
-            else if (DownloadUrlResolver.TryNormalizeYoutubePlaylistUrl(url, out url))
+            else if (DownloadUrlResolver.TryNormalizeYoutubePlaylistUrl(url, ref url))
             {
                 PlaylistUrl = url;
                 btnFetchPlaylist_Click(null, null);
@@ -359,9 +359,15 @@ namespace YoutubeListSyncronizer
                             text = status.IsAlreadyExists ? "Already exists." : "Completed!";
                         else
                         {
-                            text = Debugger.IsAttached
-                                ? status.Exception.GetExceptionString()
-                                : status.ExceptionMessage.ToStringByDefaultValue("Failed to find resolution: " + status.Exception.GetExceptionString());
+                            if (Debugger.IsAttached)
+                                text = status.Exception.GetExceptionString();
+                            else
+                            {
+                                if (status.Exception is YoutubeBannedException)
+                                    text = status.ExceptionMessage.ToStringByDefaultValue("Youtube has banned your IP. Try again later.");
+                                else
+                                    text = status.ExceptionMessage.ToStringByDefaultValue("Failed to find resolution: " + status.Exception.GetExceptionString());
+                            }
                         }
                     }
                     else

@@ -114,7 +114,7 @@ namespace YoutubeListSyncronizer
             {
                 StatusArr[Index].IsSuccessful = false;
                 if (ex is WebException)
-                    StatusArr[Index].ExceptionMessage = "Video cannot be reached at the moment.";
+                    StatusArr[Index].ExceptionMessage = "Video cannot be reached at the moment: Error:" + ex.ConvertExceptionToString();
                 else
                 if (ex is VideoNotAvailableException)
                     StatusArr[Index].ExceptionMessage = ex.Message;

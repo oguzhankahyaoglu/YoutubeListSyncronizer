@@ -72,8 +72,11 @@ namespace YoutubeListSyncronizer.Library
                     }
                 }
             }
-            catch (WebException)
+            catch (WebException ex)
             {
+                var response = ex.Response as HttpWebResponse;
+                if (response != null && response.StatusCode == HttpStatusCode.Forbidden)
+                    throw new YoutubeBannedException();
                 throw;
             }
             this.OnDownloadFinished(EventArgs.Empty);

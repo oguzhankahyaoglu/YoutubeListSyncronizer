@@ -106,6 +106,7 @@
     <Compile Include="VideoDeletedException.cs" />
     <Compile Include="VideoDownloader.cs" />
     <Compile Include="VideoInfo.cs" />
+    <Compile Include="YoutubeBannedException.cs" />
     <Compile Include="VideoNotAvailableException.cs" />
     <Compile Include="VideoType.cs" />
     <Compile Include="YoutubeParseException.cs" />

@@ -52,7 +52,7 @@ namespace YoutubeListSyncronizer
             var sb = new StringBuilder();
             sb.AppendLine("<log>");
             string[] stackTrace = exception.StackTrace.ToStringByDefaultValue().Split(new[] { " at " }, StringSplitOptions.None);
-            sb.AppendFormat("<message>{0}</message>\n", exception.Message);
+            sb.AppendFormat("<message>[{0}] {1}</message>\n", exception.GetType(), exception.Message);
             sb.AppendFormat("<source>{0}</source>\n", exception.Source);
             sb.AppendFormat("<stack>{0}</stack>\n", String.Join("\nat ", stackTrace));
             if (exception.InnerException != null)

@@ -79,7 +79,7 @@ namespace YoutubeListSyncronizer.Library
             if (videoUrl == null)
                 throw new ArgumentNullException("videoUrl");
 
-            bool isYoutubeUrl = TryNormalizeYoutubeUrl(videoUrl, out videoUrl);
+            bool isYoutubeUrl = TryNormalizeYoutubeUrl(videoUrl, ref videoUrl);
 
             if (!isYoutubeUrl)
             {
@@ -134,7 +134,7 @@ namespace YoutubeListSyncronizer.Library
         /// <returns>
         /// <c>true</c>, if the normalization was successful; <c>false</c>, if the URL is invalid.
         /// </returns>
-        public static bool TryNormalizeYoutubeUrl(string url, out string normalizedUrl)
+        public static bool TryNormalizeYoutubeUrl(string url, ref string normalizedUrl)
         {
             url = url.Trim();
 
@@ -154,10 +154,7 @@ namespace YoutubeListSyncronizer.Library
             string v;
 
             if (!query.TryGetValue("v", out v))
-            {
-                normalizedUrl = null;
                 return false;
-            }
 
             normalizedUrl = "http://youtube.com/watch?v=" + v;
 
@@ -173,7 +170,7 @@ namespace YoutubeListSyncronizer.Library
         /// <returns>
         /// <c>true</c>, if the normalization was successful; <c>false</c>, if the URL is invalid.
         /// </returns>
-        public static bool TryNormalizeYoutubePlaylistUrl(string url, out string normalizedUrl)
+        public static bool TryNormalizeYoutubePlaylistUrl(string url, ref string normalizedUrl)
         {
             url = url.Trim();
 
