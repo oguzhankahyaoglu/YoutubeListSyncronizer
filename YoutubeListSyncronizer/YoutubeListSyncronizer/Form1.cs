@@ -44,28 +44,31 @@ namespace YoutubeListSyncronizer
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-            //try to get url from clipboard first
-            var url = Clipboard.GetText();
-            String normalizedUrl;
-            var defaultUrl = "https://www.youtube.com/playlist?list=PLDZMiVQ0iUnCwGbMckmoupzrmTNRIo-Y0";
-            if (!String.IsNullOrEmpty(url) && DownloadUrlResolver.TryNormalizeYoutubeUrl(url, out normalizedUrl))
+            String url;
             {
-                VideoUrl = normalizedUrl;
+                //try to get url from clipboard first
+                var clipboardUrl = Clipboard.GetText().ToStringByDefaultValue();
+                var defaultUrl = "https://www.youtube.com/playlist?list=PLDZMiVQ0iUnCwGbMckmoupzrmTNRIo-Y0";
+                if (clipboardUrl.Contains("youtube") || clipboardUrl.Contains("tube"))
+                    url = clipboardUrl;
+                else
+                    url = Interaction.InputBox("Youtube video/playlist link:", "Link", defaultUrl);
+            }
+
+            if (DownloadUrlResolver.TryNormalizeYoutubeUrl(url, out url))
+            {
+                VideoUrl = url;
+                btnFetchPlaylist_Click(null, null);
+            }
+            else if (DownloadUrlResolver.TryNormalizeYoutubePlaylistUrl(url, out url))
+            {
+                PlaylistUrl = url;
                 btnFetchPlaylist_Click(null, null);
             }
             else
             {
-                url = Interaction.InputBox("Youtube video/playlist link:", "Link", defaultUrl);
-                if (!String.IsNullOrEmpty(url) && DownloadUrlResolver.TryNormalizeYoutubePlaylistUrl(url, out normalizedUrl))
-                {
-                    PlaylistUrl = url;
-                    btnFetchPlaylist_Click(null, null);
-                }
-                else
-                {
-                    MessageBox.Show("Invalid url.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    Application.ExitThread();
-                }
+                MessageBox.Show("Invalid url.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Application.ExitThread();
             }
         }
 

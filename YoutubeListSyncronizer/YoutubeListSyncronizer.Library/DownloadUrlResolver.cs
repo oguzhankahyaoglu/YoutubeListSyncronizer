@@ -97,11 +97,11 @@ namespace YoutubeListSyncronizer.Library
 
                 IEnumerable<VideoInfo> infos = GetVideoInfos(downloadUrls, videoTitle, videoPageSource).ToList();
 
-                string htmlPlayerVersion = GetHtml5PlayerVersion(json);
+                //string htmlPlayerVersion = GetHtml5PlayerVersion(json);
 
                 foreach (VideoInfo info in infos)
                 {
-                    info.HtmlPlayerVersion = htmlPlayerVersion;
+                    //info.HtmlPlayerVersion = htmlPlayerVersion;
 
                     if (decryptSignature && info.RequiresDecryption)
                     {
