@@ -98,11 +98,11 @@ namespace YoutubeListSyncronizer.Library
 
                 IEnumerable<VideoInfo> infos = GetVideoInfos(downloadUrls, videoTitle, videoPageSource).ToList();
 
-                //string htmlPlayerVersion = GetHtml5PlayerVersion(json);
+                string htmlPlayerVersion = GetHtml5PlayerVersion(json);
 
                 foreach (VideoInfo info in infos)
                 {
-                    //info.HtmlPlayerVersion = htmlPlayerVersion;
+                    info.HtmlPlayerVersion = htmlPlayerVersion;
 
                     if (decryptSignature && info.RequiresDecryption)
                     {
@@ -155,48 +155,12 @@ namespace YoutubeListSyncronizer.Library
             string v;
 
             if (!query.TryGetValue("v", out v))
-                return false;
-
-            normalizedUrl = "http://youtube.com/watch?v=" + v;
-
-            return true;
-        }
-
-        /// <summary>
-        /// Normalizes the given YouTube "PLAYLIST" URL to the format https://www.youtube.com/playlist?list={youtube-id}
-        /// and returns whether the normalization was successful or not.
-        /// </summary>
-        /// <param name="url">The YouTube URL to normalize.</param>
-        /// <param name="normalizedUrl">The normalized YouTube URL.</param>
-        /// <returns>
-        /// <c>true</c>, if the normalization was successful; <c>false</c>, if the URL is invalid.
-        /// </returns>
-        public static bool TryNormalizeYoutubePlaylistUrl(string url, ref string normalizedUrl)
-        {
-            url = url.Trim();
-
-            url = url.Replace("youtu.be/", "youtube.com/playlist?list=");
-            url = url.Replace("www.youtube", "youtube");
-            url = url.Replace("youtube.com/embed/", "youtube.com/playlist?list=");
-
-            if (url.Contains("/list/"))
-            {
-                url = "http://youtube.com" + new Uri(url).AbsolutePath.Replace("/list/", "/playlist?list=");
-            }
-
-            url = url.Replace("/watch#", "/playlist?");
-
-            IDictionary<string, string> query = HttpHelper.ParseQueryString(url);
-
-            string v;
-
-            if (!query.TryGetValue("list", out v))
             {
                 normalizedUrl = null;
                 return false;
             }
 
-            normalizedUrl = "http://youtube.com/playlist?list=" + v;
+            normalizedUrl = "http://youtube.com/watch?v=" + v;
 
             return true;
         }
@@ -261,7 +225,7 @@ namespace YoutubeListSyncronizer.Library
 
         private static string GetHtml5PlayerVersion(JObject json)
         {
-            var regex = new Regex(@"html5player-(.+?)\.js");
+            var regex = new Regex(@"player-(.+?).js");
 
             string js = json["assets"]["js"].ToString();
 
@@ -376,6 +340,45 @@ namespace YoutubeListSyncronizer.Library
             public bool RequiresDecryption { get; set; }
 
             public Uri Uri { get; set; }
+        }
+
+        /// <summary>
+        /// Normalizes the given YouTube "PLAYLIST" URL to the format https://www.youtube.com/playlist?list={youtube-id}
+        /// and returns whether the normalization was successful or not.
+        /// </summary>
+        /// <param name="url">The YouTube URL to normalize.</param>
+        /// <param name="normalizedUrl">The normalized YouTube URL.</param>
+        /// <returns>
+        /// <c>true</c>, if the normalization was successful; <c>false</c>, if the URL is invalid.
+        /// </returns>
+        public static bool TryNormalizeYoutubePlaylistUrl(string url, ref string normalizedUrl)
+        {
+            url = url.Trim();
+
+            url = url.Replace("youtu.be/", "youtube.com/playlist?list=");
+            url = url.Replace("www.youtube", "youtube");
+            url = url.Replace("youtube.com/embed/", "youtube.com/playlist?list=");
+
+            if (url.Contains("/list/"))
+            {
+                url = "http://youtube.com" + new Uri(url).AbsolutePath.Replace("/list/", "/playlist?list=");
+            }
+
+            url = url.Replace("/watch#", "/playlist?");
+
+            IDictionary<string, string> query = HttpHelper.ParseQueryString(url);
+
+            string v;
+
+            if (!query.TryGetValue("list", out v))
+            {
+                normalizedUrl = null;
+                return false;
+            }
+
+            normalizedUrl = "http://youtube.com/playlist?list=" + v;
+
+            return true;
         }
     }
 }

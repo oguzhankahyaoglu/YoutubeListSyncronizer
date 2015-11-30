@@ -45,23 +45,23 @@ namespace YoutubeListSyncronizer
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-            String url = "";
+            const string defaultUrl = "https://www.youtube.com/playlist?list=PLDZMiVQ0iUnCwGbMckmoupzrmTNRIo-Y0";
+            String url = null, inputUrl;
             {
                 //try to get url from clipboard first
-                var clipboardUrl = Clipboard.GetText().ToStringByDefaultValue();
-                var defaultUrl = "https://www.youtube.com/playlist?list=PLDZMiVQ0iUnCwGbMckmoupzrmTNRIo-Y0";
-                if ((clipboardUrl.Contains("youtube") || clipboardUrl.Contains("tube")) && (clipboardUrl.Contains("http:") || clipboardUrl.Contains("https:")))
-                    url = clipboardUrl;
-                else
-                    url = Interaction.InputBox("Youtube video/playlist link:", "Link", defaultUrl);
+                //var clipboardUrl = Clipboard.GetText().ToStringByDefaultValue();
+                //if ((clipboardUrl.Contains("youtube") || clipboardUrl.Contains("tube")) && (clipboardUrl.Contains("http:") || clipboardUrl.Contains("https:")))
+                //    url = clipboardUrl;
+                //else
+                inputUrl = Interaction.InputBox("Youtube video/playlist link:", "Link", defaultUrl);
             }
 
-            if (DownloadUrlResolver.TryNormalizeYoutubeUrl(url, ref url))
+            if (DownloadUrlResolver.TryNormalizeYoutubeUrl(inputUrl, ref url))
             {
                 VideoUrl = url;
                 btnFetchPlaylist_Click(null, null);
             }
-            else if (DownloadUrlResolver.TryNormalizeYoutubePlaylistUrl(url, ref url))
+            else if (DownloadUrlResolver.TryNormalizeYoutubePlaylistUrl(inputUrl, ref url))
             {
                 PlaylistUrl = url;
                 btnFetchPlaylist_Click(null, null);
