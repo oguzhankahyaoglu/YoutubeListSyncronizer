@@ -102,11 +102,17 @@ namespace YoutubeListSyncronizer
                 if (video.RequiresDecryption)
                     DownloadUrlResolver.DecryptDownloadUrl(video);
 
-                var fileName = "{1}_{3}p{2}".FormatString(video.VideoID, RemoveIllegalPathCharacters(video.Title).Left(100), video.VideoExtension, video.Resolution);
-                var downloadPath = Path.Combine(DownloadFolder, fileName);
-                var videoDownloader = new VideoDownloader(video, downloadPath);
-                videoDownloader.DownloadProgressChanged += (sender, args) => StatusArr[Index].Progress = Convert.ToInt32(args.ProgressPercentage);
-                videoDownloader.Execute();
+                {
+                    var title = RemoveIllegalPathCharacters(video.Title).Left(100);
+                    var extension = video.VideoExtension;
+                    var resolution = video.Resolution;
+                    var index = Index.ToString("D4");
+                    var fileName = "{4}_{1}_{3}p{2}".FormatString(video.VideoID, title, extension, resolution, index);
+                    var downloadPath = Path.Combine(DownloadFolder, fileName);
+                    var videoDownloader = new VideoDownloader(video, downloadPath);
+                    videoDownloader.DownloadProgressChanged += (sender, args) => StatusArr[Index].Progress = Convert.ToInt32(args.ProgressPercentage);
+                    videoDownloader.Execute();
+                }
 
                 StatusArr[Index].IsSuccessful = true;
                 StatusArr[Index].Progress = 100;
@@ -129,7 +135,7 @@ namespace YoutubeListSyncronizer
         private bool CheckIfVideoExists()
         {
             var title = RemoveIllegalPathCharacters(VideoTitle).Left(200);
-            var files = Directory.GetFiles(DownloadFolder, title + "*");
+            var files = Directory.GetFiles(DownloadFolder, "*" + title + "*");
             var result = files.Any();
             return result;
         }
@@ -137,7 +143,7 @@ namespace YoutubeListSyncronizer
         private VideoInfo FindVideoInfo()
         {
             String videoID;
-            var videoInfos = DownloadUrlResolver.GetDownloadUrls(DownloadUrl, out videoID, false);
+            var videoInfos = DownloadUrlResolver.GetDownloadUrls(DownloadUrl, out videoID);
             var videosWithAudio = videoInfos.Where(info => info.AudioType != AudioType.Unknown).OrderByDescending(info => info.Resolution);
             var mp4Videos = videosWithAudio.Where(info => info.VideoType == VideoType.Mp4);
             var resolutionLimitedVideos = mp4Videos.Where(info => info.Resolution <= MaxResolution);
