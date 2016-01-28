@@ -124,6 +124,7 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Helpers.cs" />
     <Compile Include="HttpHelper.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Program.cs" />
@@ -133,9 +134,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>General.resx</DependentUpon>
     </Compile>
+    <Compile Include="UrlExtensions.cs" />
     <Compile Include="WebClientExtended.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="YoutubeDownloadExe.cs" />
     <Compile Include="YTListDownloadWorker.cs">
       <SubType>Component</SubType>
     </Compile>

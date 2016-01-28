@@ -37,13 +37,11 @@
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.progressBar = new System.Windows.Forms.ProgressBar();
             this.cbmMaxRes = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.btnCheckAll = new System.Windows.Forms.Button();
-            this.btnOrderFileNames = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
@@ -65,9 +63,9 @@
             // 
             this.btnDownload.Dock = System.Windows.Forms.DockStyle.Fill;
             this.btnDownload.Enabled = false;
-            this.btnDownload.Location = new System.Drawing.Point(646, 625);
+            this.btnDownload.Location = new System.Drawing.Point(646, 661);
             this.btnDownload.Name = "btnDownload";
-            this.btnDownload.Size = new System.Drawing.Size(194, 32);
+            this.btnDownload.Size = new System.Drawing.Size(194, 36);
             this.btnDownload.TabIndex = 4;
             this.btnDownload.Text = "Start Downloading";
             this.btnDownload.UseVisualStyleBackColor = true;
@@ -88,7 +86,7 @@
             this.listView.Location = new System.Drawing.Point(3, 3);
             this.listView.MultiSelect = false;
             this.listView.Name = "listView";
-            this.listView.Size = new System.Drawing.Size(837, 616);
+            this.listView.Size = new System.Drawing.Size(837, 652);
             this.listView.TabIndex = 5;
             this.listView.UseCompatibleStateImageBehavior = false;
             this.listView.View = System.Windows.Forms.View.Details;
@@ -114,17 +112,6 @@
             // 
             this.columnHeader4.Text = "Status";
             this.columnHeader4.Width = 215;
-            // 
-            // progressBar
-            // 
-            this.tableLayoutPanel1.SetColumnSpan(this.progressBar, 3);
-            this.progressBar.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.progressBar.Location = new System.Drawing.Point(3, 663);
-            this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(837, 34);
-            this.progressBar.Step = 1;
-            this.progressBar.TabIndex = 6;
-            this.progressBar.Visible = false;
             // 
             // cbmMaxRes
             // 
@@ -153,16 +140,14 @@
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 75.03805F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 199F));
             this.tableLayoutPanel1.Controls.Add(this.listView, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.progressBar, 0, 2);
             this.tableLayoutPanel1.Controls.Add(this.btnDownload, 2, 1);
             this.tableLayoutPanel1.Controls.Add(this.flowLayoutPanel1, 1, 1);
             this.tableLayoutPanel1.Controls.Add(this.btnCheckAll, 0, 1);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 3;
+            this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 88.88889F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 5.555555F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 5.555555F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
@@ -173,33 +158,22 @@
             // 
             this.flowLayoutPanel1.Controls.Add(this.label2);
             this.flowLayoutPanel1.Controls.Add(this.cbmMaxRes);
-            this.flowLayoutPanel1.Controls.Add(this.btnOrderFileNames);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(163, 625);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(163, 661);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(477, 32);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(477, 36);
             this.flowLayoutPanel1.TabIndex = 7;
             // 
             // btnCheckAll
             // 
             this.btnCheckAll.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnCheckAll.Location = new System.Drawing.Point(3, 625);
+            this.btnCheckAll.Location = new System.Drawing.Point(3, 661);
             this.btnCheckAll.Name = "btnCheckAll";
-            this.btnCheckAll.Size = new System.Drawing.Size(154, 32);
+            this.btnCheckAll.Size = new System.Drawing.Size(154, 36);
             this.btnCheckAll.TabIndex = 8;
             this.btnCheckAll.Text = "Check/Uncheck ALL";
             this.btnCheckAll.UseVisualStyleBackColor = true;
             this.btnCheckAll.Click += new System.EventHandler(this.btnCheckAll_Click);
-            // 
-            // btnOrderFileNames
-            // 
-            this.btnOrderFileNames.Location = new System.Drawing.Point(222, 3);
-            this.btnOrderFileNames.Name = "btnOrderFileNames";
-            this.btnOrderFileNames.Size = new System.Drawing.Size(117, 23);
-            this.btnOrderFileNames.TabIndex = 9;
-            this.btnOrderFileNames.Text = "Order File Names";
-            this.btnOrderFileNames.UseVisualStyleBackColor = true;
-            this.btnOrderFileNames.Click += new System.EventHandler(this.btnOrderFileNames_Click);
             // 
             // Form1
             // 
@@ -230,13 +204,11 @@
         private System.Windows.Forms.ColumnHeader columnHeader2;
         private System.Windows.Forms.ColumnHeader columnHeader3;
         private System.Windows.Forms.ColumnHeader columnHeader4;
-        private System.Windows.Forms.ProgressBar progressBar;
         private System.Windows.Forms.ComboBox cbmMaxRes;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
         private System.Windows.Forms.Button btnCheckAll;
-        private System.Windows.Forms.Button btnOrderFileNames;
     }
 }
 

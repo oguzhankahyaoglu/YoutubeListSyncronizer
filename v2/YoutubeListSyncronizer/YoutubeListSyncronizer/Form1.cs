@@ -111,10 +111,10 @@ namespace YoutubeListSyncronizer
             if (playlistId != null)
             {
                 ytlistDownloadWorker = new YTListDownloadWorker(playlistId);
-                progressBar.Show();
+                //progressBar.Show();
                 ytlistDownloadWorker.ProgressChanged += (o, args) =>
                                                   {
-                                                      progressBar.Value = Math.Min(100, args.ProgressPercentage);
+                                                      //progressBar.Value = Math.Min(100, args.ProgressPercentage);
                                                   };
                 ytlistDownloadWorker.RunWorkerCompleted += (o, args) =>
                                                  {
@@ -138,9 +138,9 @@ namespace YoutubeListSyncronizer
                                                          listView.Items.Add(item);
                                                          index++;
                                                      }
-                                                     progressBar.Hide();
+                                                     //progressBar.Hide();
                                                      UpdateSelectedVideosArray();
-                                                     ToggleCheckedVideos();
+                                                     listView.ToggleChecked();
                                                  };
                 ytlistDownloadWorker.RunWorkerAsync();
             }
@@ -156,10 +156,10 @@ namespace YoutubeListSyncronizer
                 listView.Items.Add(item);
                 btnDownload.Enabled = true;
                 //btnFetchPlaylist.Enabled = true;
-                progressBar.Hide();
+                //progressBar.Hide();
                 UpdateSelectedVideosArray();
                 MessageBox.Show(Resources.General.WarningThisUrlIsAVideoLinkInsteadOfAPlaylist, Resources.General.Warning, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                ToggleCheckedVideos();
+                listView.ToggleChecked();
                 btnDownload_Click(null, null);
             }
         }
@@ -290,16 +290,17 @@ namespace YoutubeListSyncronizer
 
         private void StartDownloading(string videoFolder)
         {
-            progressBar.Value = 0;
-            progressBar.Show();
+            //progressBar.Value = 0;
+            //progressBar.Show();
             var maxResolution = MaxResolutions[cbmMaxRes.SelectedIndex];
             var args = new Args { MaxRes = maxResolution, ParsedVideos = ParsedVideos, VideoFolder = videoFolder };
-            FileInfo ytExe = null;
-
             var length = args.ParsedVideos.Length;
             var videoFolderInfo = new DirectoryInfo(args.VideoFolder);
+            var freshDownloaded = new List<ParsedVideo>();
             for (var i = 0; i < length; i++)
             {
+                Helpers.UpdateAndRedrawForm(this);
+
                 var video = args.ParsedVideos[i];
                 var url = "http://www.youtube.com/watch?v=" + video.VideoID;
                 //var isSelected = video.IsSelected;
@@ -307,31 +308,32 @@ namespace YoutubeListSyncronizer
                 if (!video.IsSelected)
                     continue;
 
-                if (videoFolderInfo.GetFiles("*{0}*".FormatString(video.Title)).Any())
+                if (video.Title == "Deleted video")
+                {
+                    listView.Items[i].SubItems[3].Text = "Deleted video";
+                    continue;
+                }
+
+                //check if file exists with a similar name
+                var title = video.Title.ToCustomSeoFriendly();
+                var hasSimilarFiles = videoFolderInfo.GetFiles().Any(f => f.Name.ToCustomSeoFriendly().Contains(title));
+                if (hasSimilarFiles)
                 {
                     listView.Items[i].SubItems[3].Text = "Already exists (file exists)";
                     continue;
                 }
 
-                string[] processArgs =
+                var errors = YoutubeDownloadExe.DownloadVideoAndReturnsErrors(i, url, args);
+                if (errors.IsNotNullAndEmptyString())
                 {
-                    url, 
-                    "-o \"{0}\\%(id)s-%(title)s.%(ext)s\"".FormatString(args.VideoFolder),
-                    "--no-continue -w -i -f \"mp4[height<=?720]\"",
-                };
-                ytExe = ytExe ?? GetYtDownloaderExe();
-                var process = Process.Start(ytExe.FullName, processArgs.JoinWith(" "));
-                process.WaitForExit();
+                    listView.Items[i].SubItems[3].Text = errors.Contains("copyright") ? "[Copyright Error] " + errors : "[Error] " + errors;
+                    continue;
+                }
+                listView.Items[i].SubItems[3].Text = "Downloaded.";
+                freshDownloaded.Add(video);
             }
-        }
-
-        private static FileInfo GetYtDownloaderExe()
-        {
-            FileInfo exe;
-            //"D:\Dropbox\Youtube Downloader\youtube-dl.exe" https://www.youtube.com/playlist?list=PLDZMiVQ0iUnCwGbMckmoupzrmTNRIo-Y0 -o "D:\_Videos\YT Favourites\%(autonumber)s-%(title)s.%(ext)s" --no-continue -w --playlist-reverse -i -f "mp4[height<=?720]"
-            var youtubeDlFolder = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory).Parent.GetDirectories("youtube-dl")[0];
-            exe = youtubeDlFolder.GetFiles("youtube-dl.exe")[0];
-            return exe;
+            MessageBox.Show("Complete! Downloaded {0} videos:\n{1}".FormatString(freshDownloaded.Count, freshDownloaded.Select(v => v.Title).JoinWith("\n")));
+            btnDownload.Enabled = btnCheckAll.Enabled = true;
         }
 
         #region Tooltip
@@ -358,17 +360,9 @@ namespace YoutubeListSyncronizer
 
         #endregion
 
-        private void ToggleCheckedVideos()
-        {
-            for (int i = 0; i < listView.Items.Count; i++)
-            {
-                listView.Items[i].Checked = !listView.Items[i].Checked;
-            }
-        }
-
         private void btnCheckAll_Click(object sender, EventArgs e)
         {
-            ToggleCheckedVideos();
+            listView.ToggleChecked();
         }
 
         //private void timerDownloader_Tick(object sender, EventArgs e)
@@ -448,28 +442,28 @@ namespace YoutubeListSyncronizer
             e.Item.BackColor = e.Item.Checked ? Color.GreenYellow : Color.White;
         }
 
-        private void btnOrderFileNames_Click(object sender, EventArgs e)
-        {
-            if (folderBrowser.ShowDialog() != DialogResult.OK)
-            {
-                MessageBox.Show(Resources.General.WarningNoDirectorySelected, Resources.General.WarningNoVideoSelected, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            var videoFolder = folderBrowser.SelectedPath;
-            if (videoFolder.IsNullOrEmptyString())
-                return;
-            var files = new DirectoryInfo(videoFolder).GetFiles("*.mp4", SearchOption.TopDirectoryOnly);
-            var ordered = files.OrderBy(f => f.Name).ToArray();
-            var i = 0;
-            for (; i < ordered.Length; i++)
-            {
-                var file = ordered[i];
-                //var name = file.Name.Split('-').Skip(1).JoinWith();
-                var startDate = DateTime.Now.AddDays(-5000);
-                file.CreationTime = startDate.AddDays(+ordered.Length - i);
-                //file.MoveTo("{0}\\{1:D4}-{2}".FormatString(videoFolder, i, name));
-            }
-            MessageBox.Show("Complete! Ordered {0} files.".FormatString(i));
-        }
+        //private void btnOrderFileNames_Click(object sender, EventArgs e)
+        //{
+        //    if (folderBrowser.ShowDialog() != DialogResult.OK)
+        //    {
+        //        MessageBox.Show(Resources.General.WarningNoDirectorySelected, Resources.General.WarningNoVideoSelected, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        //        return;
+        //    }
+        //    var videoFolder = folderBrowser.SelectedPath;
+        //    if (videoFolder.IsNullOrEmptyString())
+        //        return;
+        //    var files = new DirectoryInfo(videoFolder).GetFiles("*.mp4", SearchOption.TopDirectoryOnly);
+        //    var ordered = files.OrderBy(f => f.Name).ToArray();
+        //    var i = 0;
+        //    for (; i < ordered.Length; i++)
+        //    {
+        //        var file = ordered[i];
+        //        //var name = file.Name.Split('-').Skip(1).JoinWith();
+        //        var startDate = DateTime.Now.AddDays(-5000);
+        //        file.CreationTime = startDate.AddDays(+ordered.Length - i);
+        //        //file.MoveTo("{0}\\{1:D4}-{2}".FormatString(videoFolder, i, name));
+        //    }
+        //    MessageBox.Show("Complete! Ordered {0} files.".FormatString(i));
+        //}
     }
 }
