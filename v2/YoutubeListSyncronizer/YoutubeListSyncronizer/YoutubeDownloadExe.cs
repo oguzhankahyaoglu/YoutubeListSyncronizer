@@ -22,13 +22,14 @@ namespace YoutubeListSyncronizer
                 "-o \"{0}\\{1:D4}-%(title)s.%(ext)s\"".FormatString(args.VideoFolder,index+1),
                 "--no-continue -w -i",
                 //"-v ",//debug
-                //"-f \"mp4[height<=?720]\"",
+                "-f \"mp4[height<=?720]\"",
             };
             var ytExe = FindYtDownloaderExe();
             var process = new Process();
             process.StartInfo.FileName = ytExe.FullName;
             process.StartInfo.Arguments = processArgs.JoinWith(" ");
             process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = true;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
             process.Start();
