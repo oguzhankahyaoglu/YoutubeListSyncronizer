@@ -299,7 +299,12 @@ namespace YoutubeListSyncronizer
             var freshDownloaded = new List<ParsedVideo>();
             for (var i = 0; i < length; i++)
             {
-                Helpers.UpdateAndRedrawForm(this);
+                Thread.Sleep(100);
+                //Helpers.UpdateAndRedrawForm(this);
+                var item = listView.Items[i];
+                item.SubItems[3].Text = "Loading...";
+                item.EnsureVisible();
+                listView.Update();
 
                 var video = args.ParsedVideos[i];
                 var url = "http://www.youtube.com/watch?v=" + video.VideoID;
@@ -310,7 +315,7 @@ namespace YoutubeListSyncronizer
 
                 if (video.Title == "Deleted video")
                 {
-                    listView.Items[i].SubItems[3].Text = "Deleted video";
+                    item.SubItems[3].Text = "Deleted video";
                     continue;
                 }
 
@@ -319,17 +324,17 @@ namespace YoutubeListSyncronizer
                 var hasSimilarFiles = videoFolderInfo.GetFiles().Any(f => f.Name.ToCustomSeoFriendly().Contains(title));
                 if (hasSimilarFiles)
                 {
-                    listView.Items[i].SubItems[3].Text = "Already exists (file exists)";
+                    item.SubItems[3].Text = "Already exists (file exists)";
                     continue;
                 }
 
                 var errors = YoutubeDownloadExe.DownloadVideoAndReturnsErrors(i, url, args);
                 if (errors.IsNotNullAndEmptyString())
                 {
-                    listView.Items[i].SubItems[3].Text = errors.Contains("copyright") ? "[Copyright Error] " + errors : "[Error] " + errors;
+                    item.SubItems[3].Text = errors.Contains("copyright") ? "[Copyright Error] " + errors : "[Error] " + errors;
                     continue;
                 }
-                listView.Items[i].SubItems[3].Text = "Downloaded.";
+                item.SubItems[3].Text = "Downloaded.";
                 freshDownloaded.Add(video);
             }
             MessageBox.Show("Complete! Downloaded {0} videos:\n{1}".FormatString(freshDownloaded.Count, freshDownloaded.Select(v => v.Title).JoinWith("\n")));
