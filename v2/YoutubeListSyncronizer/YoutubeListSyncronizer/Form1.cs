@@ -299,7 +299,7 @@ namespace YoutubeListSyncronizer
             var freshDownloaded = new List<ParsedVideo>();
             for (var i = 0; i < length; i++)
             {
-                Thread.Sleep(100);
+                Thread.Sleep(50);
                 //Helpers.UpdateAndRedrawForm(this);
                 var item = listView.Items[i];
                 item.SubItems[3].Text = "Loading...";
@@ -328,7 +328,11 @@ namespace YoutubeListSyncronizer
                     continue;
                 }
 
-                var errors = YoutubeDownloadExe.DownloadVideoAndReturnsErrors(i, url, args);
+                var errors = YoutubeDownloadExe
+                    .DownloadVideoAndReturnsErrors(i, url, args, (data,index) =>
+                                                                 {
+                                                                     listView.Items[index].SubItems[3].Text = data;
+                                                                 });
                 if (errors.IsNotNullAndEmptyString())
                 {
                     item.SubItems[3].Text = errors.Contains("copyright") ? "[Copyright Error] " + errors : "[Error] " + errors;
