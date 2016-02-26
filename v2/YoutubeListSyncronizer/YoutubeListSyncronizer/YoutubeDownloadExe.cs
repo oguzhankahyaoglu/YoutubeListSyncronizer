@@ -29,7 +29,7 @@ namespace YoutubeListSyncronizer
             process.StartInfo.FileName = ytExe.FullName;
             process.StartInfo.Arguments = processArgs.JoinWith(" ");
             process.StartInfo.UseShellExecute = false;
-            //process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.CreateNoWindow = true;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
             process.OutputDataReceived += (sender, eventArgs) => onConsoleDataReceived.Invoke(eventArgs.Data, index);
