@@ -21,7 +21,12 @@ namespace YoutubeListSyncronizer
                 url,
                 "-o \"{0}\\{1:D4}-%(title)s.%(ext)s\"".FormatString(args.VideoFolder,index+1),
                 "--no-continue -w -i",
-                //"-v ",//debug
+                "-v ",
+                "--encoding cp857",
+                "--console-title",
+                "--write-pages",
+                "--print-json",
+                //debug
                 "-f \"mp4[height<=?720]\"",
             };
             var ytExe = FindYtDownloaderExe();
