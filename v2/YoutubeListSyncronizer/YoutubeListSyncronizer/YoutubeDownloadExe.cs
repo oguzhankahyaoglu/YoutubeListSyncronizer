@@ -19,13 +19,13 @@ namespace YoutubeListSyncronizer
             string[] processArgs =
             {
                 url,
-                "-o \"{0}\\{1:D4}-%(title)s.%(ext)s\"".FormatString(args.VideoFolder,index+1),
                 "--no-continue -w -i",
+                "-o \"{0}\\{1:D4}-%(title)s.%(ext)s\"".FormatString(args.VideoFolder,index+1),
                 "-v ",
-                "--encoding cp857",
-                "--console-title",
-                "--write-pages",
-                "--print-json",
+                //"--encoding cp857",
+                //"--console-title",
+                //"--write-pages",
+                //"--print-json",
                 //debug
                 "-f \"mp4[height<=?720]\"",
             };
@@ -33,16 +33,17 @@ namespace YoutubeListSyncronizer
             var process = new Process();
             process.StartInfo.FileName = ytExe.FullName;
             process.StartInfo.Arguments = processArgs.JoinWith(" ");
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = false;
-            process.StartInfo.RedirectStandardOutput = false;
-            process.StartInfo.RedirectStandardError = true;
-            process.OutputDataReceived += (sender, eventArgs) => onConsoleDataReceived.Invoke(eventArgs.Data, index);
+            //process.StartInfo.UseShellExecute = false;
+            //process.StartInfo.CreateNoWindow = false;
+            //process.StartInfo.RedirectStandardOutput = false;
+            //process.StartInfo.RedirectStandardError = true;
+            //process.OutputDataReceived += (sender, eventArgs) => onConsoleDataReceived.Invoke(eventArgs.Data, index);
             process.Start();
             //var result = process.StandardOutput.ReadToEnd();
-            var errors = process.StandardError.ReadToEnd();
+            //var errors = process.StandardError.ReadToEnd();
             process.WaitForExit();
-            return errors;
+            //return errors;
+            return null;
         }
 
         private static FileInfo YtDownloaderExe;
