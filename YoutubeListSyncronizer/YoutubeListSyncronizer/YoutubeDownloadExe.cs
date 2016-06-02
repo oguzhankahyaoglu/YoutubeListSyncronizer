@@ -34,6 +34,7 @@ namespace YoutubeListSyncronizer
             var process = new Process();
             process.StartInfo.FileName = ytExe.FullName;
             process.StartInfo.Arguments = processArgs.JoinWith(" ");
+            process.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
             //process.StartInfo.UseShellExecute = false;
             //process.StartInfo.CreateNoWindow = false;
             //process.StartInfo.RedirectStandardOutput = false;
