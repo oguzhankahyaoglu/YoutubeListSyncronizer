@@ -28,7 +28,7 @@ namespace YoutubeListSyncronizer
                 //"--print-json",
                 //debug
                 //"-f \"mp4[height<=?{0}]\"".FormatString(args.MaxRes)
-                "-f \"mp4+best[height>=?720]\""
+                "-f \"mp4+best\""
             };
             var ytExe = FindYtDownloaderExe();
             var process = new Process();
