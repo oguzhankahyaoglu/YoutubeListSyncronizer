@@ -292,6 +292,7 @@ namespace YoutubeListSyncronizer
         {
             //progressBar.Value = 0;
             //progressBar.Show();
+            this.WindowState = FormWindowState.Minimized;
             var maxResolution = MaxResolutions[cbmMaxRes.SelectedIndex];
             var args = new Args { MaxRes = maxResolution, ParsedVideos = ParsedVideos, VideoFolder = videoFolder };
             var length = args.ParsedVideos.Length;
@@ -305,7 +306,7 @@ namespace YoutubeListSyncronizer
                 item.SubItems[3].Text = "Loading...";
                 item.EnsureVisible();
                 listView.Update();
-
+                this.Text = "{0}/{1} Youtube Syncronizer".FormatString(i + 1, length);
                 var video = args.ParsedVideos[i];
                 var url = "http://www.youtube.com/watch?v=" + video.VideoID;
                 //var isSelected = video.IsSelected;
@@ -329,7 +330,7 @@ namespace YoutubeListSyncronizer
                 }
 
                 var errors = YoutubeDownloadExe
-                    .DownloadVideoAndReturnsErrors(i, url, args, (data,index) =>
+                    .DownloadVideoAndReturnsErrors(i, url, args, (data, index) =>
                                                                  {
                                                                      listView.Items[index].SubItems[3].Text = data;
                                                                  });
@@ -341,6 +342,7 @@ namespace YoutubeListSyncronizer
                 item.SubItems[3].Text = "Downloaded.";
                 freshDownloaded.Add(video);
             }
+            this.WindowState = FormWindowState.Normal;
             MessageBox.Show("Complete! Downloaded {0} videos:\n{1}".FormatString(freshDownloaded.Count, freshDownloaded.Select(v => v.Title).JoinWith("\n")));
             btnDownload.Enabled = btnCheckAll.Enabled = true;
         }
