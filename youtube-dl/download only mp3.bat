@@ -1,0 +1,1 @@
+youtube-dl https://www.youtube.com/playlist?list=PLlrjGwEZkE7wqwaXIr4ELFMyFge19x81i --audio-format "mp3" -x --ffmpeg-location "c:\ffmpeg\bin" -i -o "d:\youtube\%%(title)s.%%(ext)s"
