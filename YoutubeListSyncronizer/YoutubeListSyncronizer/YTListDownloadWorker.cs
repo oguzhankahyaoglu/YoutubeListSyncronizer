@@ -87,7 +87,13 @@ namespace YoutubeListSyncronizer
                 var response = request.Execute();
 
                 foreach (var playlistItem in response.Items)
-                    VideoIDsDictionary.Add(playlistItem.Snippet.ResourceId.VideoId, playlistItem.Snippet.Title);
+                {
+                    var videoId = playlistItem.Snippet.ResourceId.VideoId;
+                    if (VideoIDsDictionary.ContainsKey(videoId))
+                        continue;
+                    var title = playlistItem.Snippet.Title;
+                    VideoIDsDictionary.Add(videoId, title);
+                }
 
                 nextPageToken = response.NextPageToken;
             }
