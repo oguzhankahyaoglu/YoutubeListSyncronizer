@@ -378,5 +378,12 @@ namespace YoutubeListSyncronizer
 
             return true;
         }
+        public static bool TryNormalizeYoutubeUserUrl(string url, out string username)
+        {
+            url = url.Trim();
+            var matches = Regex.Matches(url, @"\/user\/([^?#]*)(.*?)");
+            username = matches.Cast<Match>().ElementAtOrDefault(0)?.Groups.Cast<Group>().ElementAtOrDefault(1)?.Value?.Trim('/');
+            return username != null;
+        }
     }
 }

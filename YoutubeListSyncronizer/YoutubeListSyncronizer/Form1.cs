@@ -60,7 +60,9 @@ namespace YoutubeListSyncronizer
 
         private String PlaylistUrl;
         private String VideoUrl;
+        private String UserName;
         private YTListDownloadWorker ytlistDownloadWorker;
+        private YTUserVideoLinksWorker yTUserVideoLinksWorker;
         private ParsedVideo[] ParsedVideos;
 
         public Form1()
@@ -82,7 +84,7 @@ namespace YoutubeListSyncronizer
                 //if ((clipboardUrl.Contains("youtube") || clipboardUrl.Contains("tube")) && (clipboardUrl.Contains("http:") || clipboardUrl.Contains("https:")))
                 //    url = clipboardUrl;
                 //else
-                inputUrl = Interaction.InputBox("Youtube video/playlist link:", "Link", defaultUrl);
+                inputUrl = Interaction.InputBox("Enter Youtube video/playlist/user link. Example links:\n\nVideo link: \nhttps://www.youtube.com/watch?v=KxgZR8epXio\nPlaylist link: \nhttps://www.youtube.com/playlist?list=PLmqdK5_Qu7DKBH722l2ab0rQbPxmpqk0k\nUser link:\nhttps://www.youtube.com/user/DarduinMyMenlon", "Link", defaultUrl);
             }
 
             if (DownloadUrlResolver.TryNormalizeYoutubeUrl(inputUrl, ref url))
@@ -93,6 +95,10 @@ namespace YoutubeListSyncronizer
             else if (DownloadUrlResolver.TryNormalizeYoutubePlaylistUrl(inputUrl, ref url))
             {
                 PlaylistUrl = url;
+                btnFetchPlaylist_Click(null, null);
+            }
+            else if (DownloadUrlResolver.TryNormalizeYoutubeUserUrl(inputUrl, out UserName))
+            {
                 btnFetchPlaylist_Click(null, null);
             }
             else
@@ -143,6 +149,43 @@ namespace YoutubeListSyncronizer
                                                      listView.ToggleChecked();
                                                  };
                 ytlistDownloadWorker.RunWorkerAsync();
+            }
+            else if (UserName != null)
+            {
+                yTUserVideoLinksWorker = new YTUserVideoLinksWorker(UserName);
+                //progressBar.Show();
+                yTUserVideoLinksWorker.ProgressChanged += (o, args) =>
+                {
+                    //progressBar.Value = Math.Min(100, args.ProgressPercentage);
+                };
+                yTUserVideoLinksWorker.RunWorkerCompleted += (o, args) =>
+                {
+                    if (args.Error != null)
+                    {
+                        MessageBox.Show(args.Error.ConvertExceptionToString());
+                        Visible = false;
+                        Logger.Log(args.Error);
+                        Application.Exit();
+                        return;
+                    }
+                    MessageBox.Show(Resources.General.TotalVideosInThisList + yTUserVideoLinksWorker.TotalVideoCount);
+                    btnDownload.Enabled = true;
+                    listView.Items.Clear();
+                    var index = 1;
+
+                    var orderedDic = yTUserVideoLinksWorker.VideoIDsDictionary.Reverse();
+                    foreach (var kvp in orderedDic)
+                    {
+                        var item = new ListViewItem(new[] { index.ToString("D4"), kvp.Key, kvp.Value, "" });
+                        listView.Items.Add(item);
+                        index++;
+                    }
+                    //progressBar.Hide();
+                    UpdateSelectedVideosArray();
+                    listView.ToggleChecked();
+                };
+                yTUserVideoLinksWorker.RunWorkerAsync();
+
             }
             else
             {
@@ -269,6 +312,8 @@ namespace YoutubeListSyncronizer
                 return;
             if (ytlistDownloadWorker != null)
                 videoFolder = Path.Combine(videoFolder, ytlistDownloadWorker.PlaylistName);
+            if (yTUserVideoLinksWorker != null)
+                videoFolder = Path.Combine(videoFolder, yTUserVideoLinksWorker.Username);
             if (!Directory.Exists(videoFolder))
                 Directory.CreateDirectory(videoFolder);
             if (!HasWritePermissionOnDir(videoFolder))

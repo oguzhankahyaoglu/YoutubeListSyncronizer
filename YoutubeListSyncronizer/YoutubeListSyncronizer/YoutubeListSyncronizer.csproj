@@ -140,6 +140,9 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="YoutubeDownloadExe.cs" />
+    <Compile Include="YTUserVideoLinksWorker.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="YTListDownloadWorker.cs">
       <SubType>Component</SubType>
     </Compile>
