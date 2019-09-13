@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Diagnostics;
 using System.Windows.Forms;
 
 namespace YoutubeListSyncronizer
@@ -18,6 +16,8 @@ namespace YoutubeListSyncronizer
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            Swagger.YTAPI.Client.Configuration.DefaultApiClient.BasePath = "http://ytdownloader-api.herokuapp.com/";
+            Swagger.YTAPI.Client.Configuration.DefaultApiClient.RestClient.BaseUrl = new Uri("http://ytdownloader-api.herokuapp.com/");
             Application.Run(new Form1());
         }
 

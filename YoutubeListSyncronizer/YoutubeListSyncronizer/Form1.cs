@@ -1,24 +1,13 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Security.AccessControl;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml;
-using System.Xml.Linq;
-using System.Xml.XPath;
-using Kahia.Common.Extensions.ConversionExtensions;
 using Kahia.Common.Extensions.GeneralExtensions;
 using Kahia.Common.Extensions.StringExtensions;
 using Microsoft.VisualBasic;
@@ -132,12 +121,12 @@ namespace YoutubeListSyncronizer
                                                          Application.Exit();
                                                          return;
                                                      }
-                                                     MessageBox.Show(Resources.General.TotalVideosInThisList + ytlistDownloadWorker.TotalVideoCount);
+                                                     MessageBox.Show(Resources.General.TotalVideosInThisList + ytlistDownloadWorker.Model.VideoIDsDictionary.Count);
                                                      btnDownload.Enabled = true;
                                                      listView.Items.Clear();
                                                      var index = 1;
 
-                                                     var orderedDic = ytlistDownloadWorker.VideoIDsDictionary.Reverse();
+                                                     var orderedDic = ytlistDownloadWorker.Model.VideoIDsDictionary.Reverse();
                                                      foreach (var kvp in orderedDic)
                                                      {
                                                          var item = new ListViewItem(new[] { index.ToString("D4"), kvp.Key, kvp.Value, "" });
@@ -168,12 +157,12 @@ namespace YoutubeListSyncronizer
                         Application.Exit();
                         return;
                     }
-                    MessageBox.Show(Resources.General.TotalVideosInThisList + yTUserVideoLinksWorker.TotalVideoCount);
+                    MessageBox.Show(Resources.General.TotalVideosInThisList + yTUserVideoLinksWorker.Model.VideoIDsDictionary.Count);
                     btnDownload.Enabled = true;
                     listView.Items.Clear();
                     var index = 1;
 
-                    var orderedDic = yTUserVideoLinksWorker.VideoIDsDictionary.Reverse();
+                    var orderedDic = yTUserVideoLinksWorker.Model.VideoIDsDictionary.Reverse();
                     foreach (var kvp in orderedDic)
                     {
                         var item = new ListViewItem(new[] { index.ToString("D4"), kvp.Key, kvp.Value, "" });
@@ -311,7 +300,7 @@ namespace YoutubeListSyncronizer
             if (videoFolder.IsNullOrEmptyString())
                 return;
             if (ytlistDownloadWorker != null)
-                videoFolder = Path.Combine(videoFolder, ytlistDownloadWorker.PlaylistName);
+                videoFolder = Path.Combine(videoFolder, ytlistDownloadWorker.Model.PlaylistName);
             if (yTUserVideoLinksWorker != null)
                 videoFolder = Path.Combine(videoFolder, yTUserVideoLinksWorker.Username);
             if (!Directory.Exists(videoFolder))

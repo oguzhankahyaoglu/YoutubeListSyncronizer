@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Kahia.Common.Extensions.ConversionExtensions;
 using Kahia.Common.Extensions.StringExtensions;
 
