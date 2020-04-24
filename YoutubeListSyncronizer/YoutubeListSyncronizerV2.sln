@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YoutubeListSyncronizer", "Y
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swagger.YTAPI", "Swagger.YTAPI\Swagger.YTAPI.csproj", "{33EA22BB-89C5-4230-8BDB-052CD608D00D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsFormsApp1", "WindowsFormsApp1\WindowsFormsApp1.csproj", "{96DB7459-5817-4B08-850E-0F579A7CD12B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{33EA22BB-89C5-4230-8BDB-052CD608D00D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33EA22BB-89C5-4230-8BDB-052CD608D00D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{33EA22BB-89C5-4230-8BDB-052CD608D00D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96DB7459-5817-4B08-850E-0F579A7CD12B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96DB7459-5817-4B08-850E-0F579A7CD12B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96DB7459-5817-4B08-850E-0F579A7CD12B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96DB7459-5817-4B08-850E-0F579A7CD12B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -92,7 +92,7 @@ namespace YoutubeListSyncronizer
             }
             else
             {
-                MessageBox.Show(Resources.General.WarningInvalidUrl, Resources.General.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(Resources.WarningInvalidUrl, Resources.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Application.ExitThread();
             }
         }
@@ -121,7 +121,7 @@ namespace YoutubeListSyncronizer
                                                          Application.Exit();
                                                          return;
                                                      }
-                                                     MessageBox.Show(Resources.General.TotalVideosInThisList + ytlistDownloadWorker.Model.VideoIDsDictionary.Count);
+                                                     MessageBox.Show(Resources.TotalVideosInThisList + ytlistDownloadWorker.Model.VideoIDsDictionary.Count);
                                                      btnDownload.Enabled = true;
                                                      listView.Items.Clear();
                                                      var index = 1;
@@ -157,7 +157,7 @@ namespace YoutubeListSyncronizer
                         Application.Exit();
                         return;
                     }
-                    MessageBox.Show(Resources.General.TotalVideosInThisList + yTUserVideoLinksWorker.Model.VideoIDsDictionary.Count);
+                    MessageBox.Show(Resources.TotalVideosInThisList + yTUserVideoLinksWorker.Model.VideoIDsDictionary.Count);
                     btnDownload.Enabled = true;
                     listView.Items.Clear();
                     var index = 1;
@@ -181,7 +181,7 @@ namespace YoutubeListSyncronizer
                 var youtubeVideoID = ParseVideoID();
                 if (youtubeVideoID == null)
                 {
-                    MessageBox.Show(Resources.General.NotValidUrl, Resources.General.NotValidUrlTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(Resources.NotValidUrl, Resources.NotValidUrlTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
                 var item = new ListViewItem(new[] { 1.ToString("D4"), youtubeVideoID, PlaylistUrl, "" });
@@ -190,7 +190,7 @@ namespace YoutubeListSyncronizer
                 //btnFetchPlaylist.Enabled = true;
                 //progressBar.Hide();
                 UpdateSelectedVideosArray();
-                MessageBox.Show(Resources.General.WarningThisUrlIsAVideoLinkInsteadOfAPlaylist, Resources.General.Warning, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(Resources.WarningThisUrlIsAVideoLinkInsteadOfAPlaylist, Resources.Warning, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 listView.ToggleChecked();
                 btnDownload_Click(null, null);
             }
@@ -288,12 +288,12 @@ namespace YoutubeListSyncronizer
             UpdateSelectedVideosArray();
             if (ParsedVideos.Count(v => v.IsSelected) <= 0)
             {
-                MessageBox.Show(Resources.General.WarningNoVideosSelectedToDownload, Resources.General.WarningNoVideoSelected, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(Resources.WarningNoVideosSelectedToDownload, Resources.WarningNoVideoSelected, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             if (folderBrowser.ShowDialog() != DialogResult.OK)
             {
-                MessageBox.Show(Resources.General.WarningNoDirectorySelected, Resources.General.WarningNoVideoSelected, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(Resources.WarningNoDirectorySelected, Resources.WarningNoVideoSelected, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
             var videoFolder = folderBrowser.SelectedPath;
@@ -307,10 +307,10 @@ namespace YoutubeListSyncronizer
                 Directory.CreateDirectory(videoFolder);
             if (!HasWritePermissionOnDir(videoFolder))
             {
-                MessageBox.Show(Resources.General.WarningAccessDenied.FormatString(videoFolder), Resources.General.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(Resources.WarningAccessDenied.FormatString(videoFolder), Resources.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            if (MessageBox.Show(Resources.General.ConfirmAreYouSure.FormatString(videoFolder), Resources.General.Confirm, MessageBoxButtons.OKCancel) != DialogResult.OK)
+            if (MessageBox.Show(Resources.ConfirmAreYouSure.FormatString(videoFolder), Resources.Confirm, MessageBoxButtons.OKCancel) != DialogResult.OK)
                 return;
             listView.BackColor = Color.LightGray;
             //btnDownload.Enabled = btnFetchPlaylist.Enabled = btnCheckAll.Enabled = flowShutdown.Enabled = false;
@@ -429,7 +429,7 @@ namespace YoutubeListSyncronizer
         //            if (status.Progress == 100)
         //            {
         //                if (status.IsSuccessful)
-        //                    text = status.IsAlreadyExists ? Resources.General.StatusAlreadyExists : Resources.General.StatusCompleted;
+        //                    text = status.IsAlreadyExists ? Resources.StatusAlreadyExists : Resources.StatusCompleted;
         //                else
         //                {
         //                    if (Debugger.IsAttached)
@@ -437,16 +437,16 @@ namespace YoutubeListSyncronizer
         //                    else
         //                    {
         //                        if (status.Exception is YoutubeBannedException)
-        //                            text = status.ExceptionMessage.ToStringByDefaultValue(Resources.General.ExMessageBannedIP);
+        //                            text = status.ExceptionMessage.ToStringByDefaultValue(Resources.ExMessageBannedIP);
         //                        else
-        //                            text = status.ExceptionMessage.ToStringByDefaultValue(Resources.General.ExMessage + status.Exception.GetExceptionString());
+        //                            text = status.ExceptionMessage.ToStringByDefaultValue(Resources.ExMessage + status.Exception.GetExceptionString());
         //                    }
         //                }
         //            }
         //            else
         //            {
         //                text = status.Progress + "%";
-        //                this.Text = Resources.General.StatusSyncronizing.FormatString(i + 1, countOfVideos, status.Progress);
+        //                this.Text = Resources.StatusSyncronizing.FormatString(i + 1, countOfVideos, status.Progress);
         //            }
         //        }
         //        listView.Items[i].SubItems[3].Text = text;
@@ -463,8 +463,8 @@ namespace YoutubeListSyncronizer
         //    if (lastCompletedDownloadIndex >= YTVideoDownloader.StatusArr.Length - 1)
         //    {
         //        timerDownloader.Stop();
-        //        this.Text = Resources.General.SyncComplete;
-        //        MessageBox.Show(Resources.General.SyncComplete, Resources.General.SyncComplete, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //        this.Text = Resources.SyncComplete;
+        //        MessageBox.Show(Resources.SyncComplete, Resources.SyncComplete, MessageBoxButtons.OK, MessageBoxIcon.Information);
         //        listView.BackColor = Color.White;
         //        //btnFetchPlaylist.Enabled = btnDownload.Enabled = btnCheckAll.Enabled = true;
         //    }
@@ -491,7 +491,7 @@ namespace YoutubeListSyncronizer
         //{
         //    if (folderBrowser.ShowDialog() != DialogResult.OK)
         //    {
-        //        MessageBox.Show(Resources.General.WarningNoDirectorySelected, Resources.General.WarningNoVideoSelected, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        //        MessageBox.Show(Resources.WarningNoDirectorySelected, Resources.WarningNoVideoSelected, MessageBoxButtons.OK, MessageBoxIcon.Warning);
         //        return;
         //    }
         //    var videoFolder = folderBrowser.SelectedPath;
