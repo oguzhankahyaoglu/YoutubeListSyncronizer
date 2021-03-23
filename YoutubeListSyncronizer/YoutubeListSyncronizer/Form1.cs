@@ -7,6 +7,7 @@ using System.Linq;
 using System.Security.AccessControl;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Kahia.Common.Extensions.GeneralExtensions;
 using Kahia.Common.Extensions.StringExtensions;
@@ -16,6 +17,7 @@ namespace YoutubeListSyncronizer
 {
     public partial class Form1 : Form
     {
+        private readonly SynchronizationContext synchronizationContext;
         public class ParsedVideo
         {
             public String VideoID { get; set; }
@@ -57,6 +59,7 @@ namespace YoutubeListSyncronizer
         public Form1()
         {
             InitializeComponent();
+            synchronizationContext = SynchronizationContext.Current;
             cbmMaxRes.Items.AddRange(MaxResolutions.Cast<object>().ToArray());
             cbmMaxRes.SelectedIndex = 1;
             folderBrowser.SelectedPath = Environment.GetFolderPath(Environment.SpecialFolder.MyVideos, Environment.SpecialFolderOption.DoNotVerify);
@@ -326,7 +329,6 @@ namespace YoutubeListSyncronizer
         {
             //progressBar.Value = 0;
             //progressBar.Show();
-            this.WindowState = FormWindowState.Minimized;
             var maxResolution = MaxResolutions[cbmMaxRes.SelectedIndex];
             var args = new Args { MaxRes = maxResolution, ParsedVideos = ParsedVideos, VideoFolder = videoFolder };
             var length = args.ParsedVideos.Length;
@@ -334,8 +336,7 @@ namespace YoutubeListSyncronizer
             var freshDownloaded = new List<ParsedVideo>();
             for (var i = 0; i < length; i++)
             {
-                Thread.Sleep(50);
-                //Helpers.UpdateAndRedrawForm(this);
+                Helpers.UpdateAndRedrawForm(this);
                 var item = listView.Items[i];
                 item.SubItems[3].Text = "Loading...";
                 item.EnsureVisible();
@@ -364,9 +365,29 @@ namespace YoutubeListSyncronizer
                 }
 
                 var errors = YoutubeDownloadExe
-                    .DownloadVideoAndReturnsErrors(i, url, args, (data, index) =>
+                    .DownloadVideoAndReturnsErrors(i, url, args, async (data, index) =>
                                                                  {
-                                                                     listView.Items[index].SubItems[3].Text = data;
+                                                                     await Task.Run(() =>
+                                                                     {
+                                                                         synchronizationContext.Post(o =>
+                                                                         {
+                                                                             listView.Items[index].SubItems[3].Text = o+"";
+                                                                             txtLogs.Text += o + Environment.NewLine;
+                                                                             txtLogs.Update();
+                                                                         }, data);
+                                                                     });
+                                                                    
+                                                                 }, async (data, index) =>
+                                                                 {
+                                                                     await Task.Run(() =>
+                                                                     {
+                                                                         synchronizationContext.Post(o =>
+                                                                         {
+                                                                             txtErrors.Text += o + Environment.NewLine;
+                                                                             txtErrors.Update();
+                                                                         }, data);
+                                                                     });
+                                                                    
                                                                  });
                 if (errors.IsNotNullAndEmptyString())
                 {
@@ -510,5 +531,8 @@ namespace YoutubeListSyncronizer
         //    }
         //    MessageBox.Show("Complete! Ordered {0} files.".FormatString(i));
         //}
+        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
+        {
+        }
     }
 }
